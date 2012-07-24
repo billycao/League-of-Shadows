@@ -1,0 +1,33 @@
+﻿<html>
+<head>
+<title>League of Interns</title>
+<link type="text/css" rel="stylesheet" href="/stylesheets/main.css" />
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+<script type="text/javascript" src="/js/main.js"></script>
+</head>
+<body>
+<h2>Game: {{ curr_game }}</h2>
+
+Your target is {{ target.victim|default:"unassigned" }}.
+
+<h3>Live Assassins</h3>
+<ul>
+{% for player in players %}
+  {% if not player.timestamp %}
+  <li><a href="https://teams.googleplex.com/#person:u={{ player.assassin }}">{{ player.assassin }}</a></li>
+  {% endif %}
+{% endfor %}
+</ul>
+
+<form action="/join" method="post">
+  <div><select name="game_name">
+  {% for game in games %}
+    <option>{{ game.key.name }}</option>
+  {% endfor %}
+  </select></div>
+  <div><input type="submit" value="Join Game"></div>
+</form>
+
+<a href="{{ url }}">{{ url_linktext }}</a>
+</body>
+</html>

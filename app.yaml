@@ -1,0 +1,27 @@
+application: google.com:leagueofinterns
+version: 1
+runtime: python
+api_version: 1
+threadsafe: yes
+
+handlers:
+- url: /favicon\.ico
+  static_files: favicon.ico
+  upload: favicon\.ico
+
+- url: /images
+  static_dir: assets/images
+- url: /js
+  static_dir: assets/js
+- url: /stylesheets
+  static_dir: assets/stylesheets
+
+- url: /admin/.*
+  script: main.py
+  login: admin
+  auth_fail_action: unauthorized
+
+- url: .*
+  script: main.py
+  login: required
+  auth_fail_action: redirect
