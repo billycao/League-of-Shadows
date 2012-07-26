@@ -9,30 +9,42 @@
 
 <div id="wrapper">
 
+<div id="header">
+    <h1>League of Interns</h1>
+</div>
+
+<!-- TODO(billycao): Add wrapper/styles for this -->
 {% if FLAGS_show_game_title  %}
     <h1>Game: {{ curr_game }}</h1>
 {% endif %}
 
-Your target is {{ target.victim|default:"unassigned" }}.
+<div id="status">
+    Your target is {{ target_mission.victim|default:"unassigned" }}.
+</div>
 
 <div id="countdown_wrapper">
-    <h3>Countdown to registration</h3>
 	<div id="countdown"></div>
 	<p id="note"></p>
 </div>
 
 <div id="register_wrapper">
-    <form action="/join" method="post">
-        <fieldset>
-            <legend>Join the other <b>{{ num_players }}</b> assassins!</legend>
-            <select name="game_name">
-                {% for game in games %}
-                    <option>{{ game.key.name }}</option>
-                {% endfor %}
-            </select>
-            <input type="submit" value="Join">
-        </fieldset>
-    </form>
+    {% if is_registered %}
+        Congratulations! You've joined the league as <b>{{ user_name }}.</b><br /><br />
+        Come back when the game begins for your first target!
+    {% else %}
+        <form action="/join" method="post">
+            <fieldset>
+                <legend>Are you an intern? Join the other <b>{{ num_players }}</b> assassins!</legend>
+                <!-- TODO(billycao): Make this system work for multiple games. -->
+                <select name="game_name" hidden>
+                    {% for game in games %}
+                        <option>{{ game.key.name }}</option>
+                    {% endfor %}
+                </select>
+                <input type="submit" value="Join">
+            </fieldset>
+        </form>
+    {% endif %}
 </div>
 
 <div id="columns_wrapper">
@@ -44,7 +56,9 @@ Your target is {{ target.victim|default:"unassigned" }}.
     </div>
 </div>
 
-<a href="{{ url }}">{{ url_linktext }}</a>
+<div id="footer">
+    <a href="{{ url }}">{{ url_linktext }}</a>
+</div>
 
 </div> <!-- wrapper -->
 <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>

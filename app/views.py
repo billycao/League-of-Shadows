@@ -1,6 +1,6 @@
 ﻿#!/usr/bin/env python
 
-import os
+import sys, os
 import urllib
 
 from google.appengine.api import urlfetch
@@ -12,16 +12,18 @@ from models import *
 class MainPage(webapp.RequestHandler):
   def get(self):
     game_name = self.request.get('game_name') or 'MTV'
+    user_name = users.get_current_user().nickname()
 
     games = Game.all()
-    missions = Mission.all().ancestor(game_key(game_name))
-    players = missions.order('assassin')
+    missions = Mission.all().ancestor(game_key(game_name)).order('assassin')
+    my_missions = missions.filter('assassin =', user_name)
 
     # Game statistics
-    num_players = players.count()
-    target = missions.order('assassin').filter('assassin =', users.get_current_user().nickname()).fetch(1)
+    num_players = missions.filter('timestamp =', None).count()
 
-    # Get current player information
+    # Player stats
+    is_registered = my_missions.count()
+    target_mission = my_missions.order('timestamp').fetch(1)
 
     if users.get_current_user():
       url = users.create_logout_url(self.request.uri)
@@ -33,10 +35,12 @@ class MainPage(webapp.RequestHandler):
     template_values = {
       'curr_game': game_name,
       'games': games,
-      'target': target,
+      'is_registered': is_registered,
       'num_players': num_players,
+      'target_mission': target_mission,
       'url': url,
       'url_linktext': url_linktext,
+      'user_name': user_name,
       'FLAGS_show_game_title': os.environ['show_game_title'] == "True"
     }
     
@@ -49,8 +53,8 @@ class JoinGame(webapp.RequestHandler):
     mission = Mission(parent=game_key(game_name))
 
     if users.get_current_user():
-      exists = Mission.all().filter('assassin =',
-      users.get_current_user().nickname()).ancestor(game_key(game_name)).count()
+      exists = Mission.all().filter('assassin =', users.get_current_user().nickname())\
+                            .ancestor(game_key(game_name)).count()
       if not exists:
         mission.assassin = users.get_current_user().nickname()
         mission.put()
