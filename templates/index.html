@@ -1,54 +1,36 @@
 ﻿<html>
-
 <head>
 <title>League of Interns</title>
-
 <link type="text/css" rel="stylesheet" href="/stylesheets/main.css" />
 <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
 <script type="text/javascript" src="/js/main.js"></script>
 </head>
-
 <body>
-
-<div id="wrapper">
-
 <h1>Game: {{ curr_game }}</h1>
 
-<!--
 Your target is {{ target.victim|default:"unassigned" }}.
--->
 
 <h2>Live Assassins</h2>
+<ul>
+{% for player in players %}
+  {% if not player.timestamp %}
+  <li><a href="https://teams.googleplex.com/#person:u={{ player.assassin }}">{{ player.assassin }}</a></li>
+  {% endif %}
+{% endfor %}
+</ul>
 
-<div id="countdown_wrapper">
-    <h3>Countdown to registration</h3>
-</div>
-
-<div id="register_wrapper">
-    <form action="/join" method="post">
-        <fieldset>
-            <legend>Join Game</legend>
-            <div><select name="game_name">
-                {% for game in games %}
-                    <option>{{ game.key.name }}</option>
-                {% endfor %}
-            </select></div>
-            <div><input type="submit" value="Join"></div>
-        </fieldset>
-    </form>
-</div>
-
-<div id="columns_wrapper">
-    <div id="column_left">
-
-    </div>
-    <div id="column_right">
-
-    </div>
-</div>
+<form action="/join" method="post">
+<fieldset>
+<legend>Join Game</legend>
+  <div><select name="game_name">
+  {% for game in games %}
+    <option>{{ game.key.name }}</option>
+  {% endfor %}
+  </select></div>
+  <div><input type="submit" value="Join"></div>
+</fieldset>
+</form>
 
 <a href="{{ url }}">{{ url_linktext }}</a>
-
-</div>
 </body>
 </html>
