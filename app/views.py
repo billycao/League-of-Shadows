@@ -12,10 +12,14 @@ from models import *
 class MainPage(webapp.RequestHandler):
   def get(self):
     game_name = self.request.get('game_name') or 'MTV'
-    player_query = Mission.all().ancestor(game_key(game_name)).order('assassin')
-    players = player_query.fetch(10)
+    missions = Mission.all().ancestor(game_key(game_name))
+
+    # All players
+    players = missions.order('assassin')
+    num_players = players.count()
     games = Game.all()
-    target = player_query.filter('assassin =', users.get_current_user().nickname()).fetch(1)
+    target = missions.order('assassin').filter('assassin =', users.get_current_user().nickname()).fetch(1)
+
 
     if users.get_current_user():
       url = users.create_logout_url(self.request.uri)
@@ -28,7 +32,7 @@ class MainPage(webapp.RequestHandler):
       'curr_game': game_name,
       'games': games,
       'target': target,
-      'players': players,
+      'num_players': num_players,
       'url': url,
       'url_linktext': url_linktext,
     }
