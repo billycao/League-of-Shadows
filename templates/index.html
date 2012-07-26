@@ -33,7 +33,7 @@
 
 <div id="register_wrapper">
     {% if is_registered %}
-        Congratulations! You've joined the league as <b>{{ user_name }}.</b><br /><br />
+        Congratulations! You've joined the game as <b>{{ user_name }}</b>.<br /><br />
         Come back when the game begins for your first target!<br /><br/>
         <b>{{ num_players|add:-1 }} other interns have joined you in the fray!</b>
     {% else %}
@@ -49,7 +49,8 @@
                         <option>{{ game.key.name }}</option>
                     {% endfor %}
                 </select>
-                <input class="big_button" type="submit" value="Join the fray!">
+                <input class="big_button" type="submit" value="Join the fray!"><br />
+                <small>Your username <b>{{ user_name }}</b> will be recorded.</small>
             </fieldset>
         </form>
     {% endif %}
