@@ -12,7 +12,9 @@
 
 <div id="wrapper">
 
-<h1>Game: {{ curr_game }}</h1>
+{% if FLAGS_show_game_title  %}
+    <h1>Game: {{ curr_game }}</h1>
+{% endif %}
 
 <!--
 Your target is {{ target.victim|default:"unassigned" }}.
@@ -27,13 +29,13 @@ Your target is {{ target.victim|default:"unassigned" }}.
 <div id="register_wrapper">
     <form action="/join" method="post">
         <fieldset>
-            <legend>Join Game</legend>
-            <div><select name="game_name">
+            <legend>Join the other <b>{{ num_players }}</b> assassins!</legend>
+            <select name="game_name">
                 {% for game in games %}
                     <option>{{ game.key.name }}</option>
                 {% endfor %}
-            </select></div>
-            <div><input type="submit" value="Join"></div>
+            </select>
+            <input type="submit" value="Join">
         </fieldset>
     </form>
 </div>
@@ -49,6 +51,6 @@ Your target is {{ target.victim|default:"unassigned" }}.
 
 <a href="{{ url }}">{{ url_linktext }}</a>
 
-</div>
+</div> <!-- wrapper -->
 </body>
 </html>
