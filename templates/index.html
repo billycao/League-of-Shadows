@@ -39,10 +39,8 @@
     {% else %}
         <form action="/join" method="post">
             <fieldset>
-                <legend>
-                    Are you an intern? What are you waiting for? <br />
-                    Join the other <b>{{ num_players }}</b> assassin{{ num_players|pluralize }}!
-                </legend>
+                Are you an intern? What are you waiting for? <br />
+                Join the other <b>{{ num_players }}</b> assassin{{ num_players|pluralize }}!<br />
                 <!-- TODO(billycao): Make this system work for multiple games. -->
                 <select name="game_name" hidden>
                     {% for game in games %}
