@@ -11,6 +11,8 @@
 
 <div id="header">
     <h1>League of Interns</h1>
+    <h2>An internal <a href="http://en.wikipedia.org/wiki/Assassin_(game)">assassins</a>
+        game for the summer MTV interns of 2012</h2>
 </div>
 
 <!-- TODO(billycao): Add wrapper/styles for this -->
@@ -18,9 +20,11 @@
     <h1>Game: {{ curr_game }}</h1>
 {% endif %}
 
+<!--
 <div id="status">
     Your target is {{ target_mission.victim|default:"unassigned" }}.
 </div>
+-->
 
 <div id="countdown_wrapper">
 	<div id="countdown"></div>
@@ -30,18 +34,22 @@
 <div id="register_wrapper">
     {% if is_registered %}
         Congratulations! You've joined the league as <b>{{ user_name }}.</b><br /><br />
-        Come back when the game begins for your first target!
+        Come back when the game begins for your first target!<br /><br/>
+        <b>{{ num_players|add:-1 }} other interns have joined you in the fray!</b>
     {% else %}
         <form action="/join" method="post">
             <fieldset>
-                <legend>Are you an intern? Join the other <b>{{ num_players }}</b> assassins!</legend>
+                <legend>
+                    Are you an intern? What are you waiting for? <br />
+                    Join the other <b>{{ num_players }}</b> assassins!
+                </legend>
                 <!-- TODO(billycao): Make this system work for multiple games. -->
                 <select name="game_name" hidden>
                     {% for game in games %}
                         <option>{{ game.key.name }}</option>
                     {% endfor %}
                 </select>
-                <input type="submit" value="Join">
+                <input class="big_button" type="submit" value="Join the fray!">
             </fieldset>
         </form>
     {% endif %}
@@ -64,5 +72,31 @@
 <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
 <script type="text/javascript" src="/js/jquery.countdown.js"></script>
 <script type="text/javascript" src="/js/main.js"></script>
+<script type="text/javascript">
+jQuery(function() {
+    {% if is_registered %}
+        // Show countdown to game start
+        var ts = new Date(2012, 7, 1, 10, 30).getTime();
+        var event = "the games begin!";
+    {% else %}
+        // Show countdown to registration end
+        var ts = new Date(2012, 6, 31, 20, 00).getTime();
+        var event = "registration ends!";
+    {% endif %}
+
+    $('#countdown').countdown({
+        timestamp	: ts,
+        callback	: function(days, hours, minutes, seconds){
+            var message = "";
+            message += days + " day" + ( days==1 ? '':'s' ) + ", ";
+            message += hours + " hour" + ( hours==1 ? '':'s' ) + ", ";
+            message += minutes + " minute" + ( minutes==1 ? '':'s' ) + " and ";
+            message += seconds + " second" + ( seconds==1 ? '':'s' ) + " <br />";
+            message += "left until " + event;
+            $('#note').html(message);
+        }
+    });
+});
+</script>
 </body>
 </html>

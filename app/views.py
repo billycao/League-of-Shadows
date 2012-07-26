@@ -15,10 +15,17 @@ class MainPage(webapp.RequestHandler):
     user_name = users.get_current_user().nickname()
 
     games = Game.all()
-    missions = Mission.all().ancestor(game_key(game_name)).order('assassin')
+    if not games.count():
+        # TODO(billycao): Migrate to template
+        self.response.out.write("No game has been created yet.<br />"
+                                "The administrator must create one before the awesomeness begins.")
+        return
+    # TODO(billycao): Encapsulate database query calls into some sort of interface
+    missions = Mission.all().ancestor(game_key(game_name))
     my_missions = missions.filter('assassin =', user_name)
 
     # Game statistics
+    missions = Mission.all().ancestor(game_key(game_name))
     num_players = missions.filter('timestamp =', None).count()
 
     # Player stats
