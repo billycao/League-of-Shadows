@@ -23,9 +23,11 @@ class StartGame(webapp.RequestHandler):
     if started:
       self.response.out.write("Already started")
       return
+
     missions = Mission.in_game(game_name).fetch(None)
     victims = [ mission.assassin for mission in missions ]
     shuffle(victims)
+
     for mission in missions:
       victim = victims.pop()
       while victim == mission.victim:

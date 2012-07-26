@@ -21,16 +21,17 @@ class MainPage(webapp.RequestHandler):
                                 "The administrator must create one before the awesomeness begins.")
         return
     # TODO(billycao): Encapsulate database query calls into some sort of interface
-    missions = Mission.all().ancestor(game_key(game_name))
-    my_missions = missions.filter('assassin =', user_name)
+    my_missions = Mission.in_game(game_name).filter(
+        'assassin =', user_name)
 
     # Game statistics
-    missions = Mission.all().ancestor(game_key(game_name))
-    num_players = missions.filter('timestamp =', None).count()
+    num_players = Player.in_game(game_name).count()
 
     # Player stats
-    is_registered = my_missions.count()
-    target_mission = my_missions.order('timestamp').fetch(1)
+    is_registered = Player.in_game(game_name).filter(
+        'nickname =', user_name).count()
+    target_mission = my_missions.order('timestamp').filter(
+        'timestamp =', None).get()
 
     if users.get_current_user():
       url = users.create_logout_url(self.request.uri)
@@ -57,14 +58,16 @@ class MainPage(webapp.RequestHandler):
 class JoinGame(webapp.RequestHandler):
   def post(self):
     game_name = self.request.get('game_name')
-    mission = Mission(parent=game_key(game_name))
 
     if users.get_current_user():
-      exists = Mission.all().filter('assassin =', users.get_current_user().nickname())\
-                            .ancestor(game_key(game_name)).count()
+      exists = Player.in_game(game_name).filter(
+          'nickname =', users.get_current_user().nickname()).count()
       if not exists:
-        mission.assassin = users.get_current_user().nickname()
-        mission.put()
+        player = Player(parent=game_key(game_name))
+        player.nickname = users.get_current_user().nickname()
+        player.uid = users.get_current_user().user_id()
+        player.email = users.get_current_user().email()
+        player.put()
       self.redirect('/?' + urllib.urlencode({'game_name': game_name}))
     else:
       url = users.create_login_url(self.request.uri)

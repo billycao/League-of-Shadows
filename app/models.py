@@ -23,7 +23,7 @@ class Mission(db.Model):
 
   def finish(self):
     self.timestamp = datettime.now()
-    vmission = self.other_players().filter(
+    vmission = self.other_missions().filter(
         'assassin =', self.victim).get()
     vmission.timestamp = datetime.now()
 
@@ -35,7 +35,7 @@ class Mission(db.Model):
     vmission.put()
     newmission.put()
 
-  def other_players(self):
+  def other_missions(self):
     return Mission.all().ancestor(self.parent_key())
 
   @staticmethod
@@ -45,6 +45,18 @@ class Mission(db.Model):
 class Game(db.Model):
   """Models a game with a name"""
   pass
+
+class Player(db.Model):
+  uid = db.StringProperty()
+  nickname = db.StringProperty()
+  email = db.StringProperty()
+
+  def other_players(self):
+    return Player.all().ancestor(self.parent_key())
+
+  @staticmethod
+  def in_game(game_name):
+    return Player.all().ancestor(game_key(game_name))
 
 def game_key(game_name=None):
   """Constructs a Datastore key for a Mission entity given an assassin."""
