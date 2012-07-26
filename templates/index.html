@@ -1,12 +1,11 @@
-﻿<html>
+﻿<!doctype html>
+<html>
 <head>
 <title>League of Interns</title>
 <link type="text/css" rel="stylesheet" href="/stylesheets/main.css" />
-<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
-<script type="text/javascript" src="/js/main.js"></script>
+<link type="text/css" rel="stylesheet" href="/stylesheets/jquery.countdown.css" />
 </head>
 <body>
-<h1>Game: {{ curr_game }}</h1>
 
 <div id="wrapper">
 
@@ -16,31 +15,10 @@
 
 Your target is {{ target.victim|default:"unassigned" }}.
 
-<h2>Live Assassins</h2>
-<ul>
-{% for player in players %}
-  {% if not player.timestamp %}
-  <li><a href="https://teams.googleplex.com/#person:u={{ player.assassin }}">{{ player.assassin }}</a></li>
-  {% endif %}
-{% endfor %}
-</ul>
-
-<form action="/join" method="post">
-<fieldset>
-<legend>Join Game</legend>
-  <div><select name="game_name">
-  {% for game in games %}
-    <option>{{ game.key.name }}</option>
-  {% endfor %}
-  </select></div>
-  <div><input type="submit" value="Join"></div>
-</fieldset>
-</form>
-
-<a href="{{ url }}">{{ url_linktext }}</a>
-
 <div id="countdown_wrapper">
     <h3>Countdown to registration</h3>
+	<div id="countdown"></div>
+	<p id="note"></p>
 </div>
 
 <div id="register_wrapper">
@@ -69,5 +47,8 @@ Your target is {{ target.victim|default:"unassigned" }}.
 <a href="{{ url }}">{{ url_linktext }}</a>
 
 </div> <!-- wrapper -->
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+<script type="text/javascript" src="/js/jquery.countdown.js"></script>
+<script type="text/javascript" src="/js/main.js"></script>
 </body>
 </html>

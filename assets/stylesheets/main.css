@@ -1,8 +1,15 @@
 ﻿/*
  * Global Styles
  */
+html {
+  background:url('../images/tile_bg.jpg') #b0b0b0;
+  position: relative;
+}
 
 body {
+  background:url('../images/page_bg_center.jpg') no-repeat center center;
+  min-height: 600px;
+  padding: 200px 0 0;
   font-family: Arial, Helvetica, Verdana, sans-serif;
   font-size: 13px;
   color: #222222;
@@ -57,4 +64,14 @@ div#wrapper {
     width: 960px;
     margin: 0 auto;
     text-align: center;
+}
+
+#note{
+	color: #666666;
+	font-size: 12px;
+	margin: 0 auto;
+	padding: 4px;
+	text-align: center;
+	text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.3);
+	width: 400px;
 }
