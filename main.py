@@ -13,7 +13,8 @@ from app.views import *
 application = webapp.WSGIApplication([
   ('/', MainPage),
   ('/join', JoinGame),
-  ('/admin/create', CreateGame)
+  ('/admin/create', CreateGame),
+  ('/admin/start', StartGame)
 ], debug=True)
 
 def main():
