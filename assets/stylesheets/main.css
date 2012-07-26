@@ -1,4 +1,46 @@
 ﻿body {
-  font-family: Verdana, Helvetica, sans-serif;
-  background-color: #DDDDDD;
+  font-family: Arial, Helvetica, Verdana, sans-serif;
+  font-size: 13px;
+  color: #222222;
+}
+
+a {
+  color: #6611CC;
+}
+
+a:visited {
+  color: #6611CC;
+}
+
+a:active {
+  color: #DD4B39;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+h1 {
+  font-weight: normal;
+  font-size: 20px;
+  color: #DD4B39;
+}
+
+h2 {
+  font-weight: normal;
+  font-size: 16px;
+  color: #222222;
+}
+
+ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+li {
+  padding: 10px;
+}
+
+fieldset {
+  border: 1px solid #ebebeb;
 }

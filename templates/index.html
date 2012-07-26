@@ -6,11 +6,11 @@
 <script type="text/javascript" src="/js/main.js"></script>
 </head>
 <body>
-<h2>Game: {{ curr_game }}</h2>
+<h1>Game: {{ curr_game }}</h1>
 
 Your target is {{ target.victim|default:"unassigned" }}.
 
-<h3>Live Assassins</h3>
+<h2>Live Assassins</h2>
 <ul>
 {% for player in players %}
   {% if not player.timestamp %}
@@ -20,12 +20,15 @@ Your target is {{ target.victim|default:"unassigned" }}.
 </ul>
 
 <form action="/join" method="post">
+<fieldset>
+<legend>Join Game</legend>
   <div><select name="game_name">
   {% for game in games %}
     <option>{{ game.key.name }}</option>
   {% endfor %}
   </select></div>
-  <div><input type="submit" value="Join Game"></div>
+  <div><input type="submit" value="Join"></div>
+</fieldset>
 </form>
 
 <a href="{{ url }}">{{ url_linktext }}</a>
