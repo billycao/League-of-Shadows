@@ -4,6 +4,10 @@ runtime: python
 api_version: 1
 threadsafe: yes
 
+env_variables:
+  # If true, show the title of the current game on the UI
+  show_game_title: false
+
 handlers:
 - url: /favicon\.ico
   static_files: favicon.ico

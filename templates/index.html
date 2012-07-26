@@ -8,6 +8,12 @@
 <body>
 <h1>Game: {{ curr_game }}</h1>
 
+<div id="wrapper">
+
+{% if FLAGS_show_game_title  %}
+    <h1>Game: {{ curr_game }}</h1>
+{% endif %}
+
 Your target is {{ target.victim|default:"unassigned" }}.
 
 <h2>Live Assassins</h2>
@@ -32,5 +38,36 @@ Your target is {{ target.victim|default:"unassigned" }}.
 </form>
 
 <a href="{{ url }}">{{ url_linktext }}</a>
+
+<div id="countdown_wrapper">
+    <h3>Countdown to registration</h3>
+</div>
+
+<div id="register_wrapper">
+    <form action="/join" method="post">
+        <fieldset>
+            <legend>Join the other <b>{{ num_players }}</b> assassins!</legend>
+            <select name="game_name">
+                {% for game in games %}
+                    <option>{{ game.key.name }}</option>
+                {% endfor %}
+            </select>
+            <input type="submit" value="Join">
+        </fieldset>
+    </form>
+</div>
+
+<div id="columns_wrapper">
+    <div id="column_left">
+
+    </div>
+    <div id="column_right">
+
+    </div>
+</div>
+
+<a href="{{ url }}">{{ url_linktext }}</a>
+
+</div> <!-- wrapper -->
 </body>
 </html>
