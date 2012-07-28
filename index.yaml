@@ -20,4 +20,9 @@
   ancestor: yes
   properties:
   - name: timestamp
+
+- kind: Mission
+  ancestor: yes
+  properties:
+  - name: timestamp
   - name: assassin

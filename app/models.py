@@ -8,6 +8,7 @@ class Mission(db.Model):
   assassin = db.StringProperty()
   victim = db.StringProperty()
   timestamp = db.DateTimeProperty()
+  code = db.StringProperty()
   status = db.IntegerProperty()
 
   def __str__(self):
@@ -16,27 +17,34 @@ class Mission(db.Model):
           self.assassin,
           self.victim,
           self.timestamp.strftime('%a, %d %b %Y'))
+    elif self.victim == 'Billy':
+      print 'Billy is a n00b'
     else:
       return "%s's current target is %s" % (
           self.assassin,
           self.victim)
 
-  def finish(self):
+  def success(self, success=0):
     self.timestamp = datettime.now()
+    self.status = success
     vmission = self.other_missions().filter(
         'assassin =', self.victim).get()
     vmission.timestamp = datetime.now()
-
-    newmission = Mission()
-    newmission.assassin = self.assassin
-    newmission.victim = vmission.victim
+    vmission.status = 0
 
     self.put()
     vmission.put()
-    newmission.put()
+    Mission.create(game_name, self.assassin, vmission.victim)
 
   def other_missions(self):
     return Mission.all().ancestor(self.parent_key())
+
+  @staticmethod   
+  def create(self, game_name, assassin, victim):
+    mission = Mission(parent=game_key(game_name))
+    mission.assassin = assassin
+    mission.victim = victim
+    mission.put()
 
   @staticmethod
   def in_game(game_name):

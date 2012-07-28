@@ -12,27 +12,34 @@ from models import *
 class CreateGame(webapp.RequestHandler):
   def get(self):
     game_name = self.request.get('game_name')
+    if db.get(game_key(game_name or 'default_game')):
+      self.response.out.write("Exists")
+      return
     game = Game(key_name=game_name or 'default_game')
     game.put()
     self.response.out.write("Created")
+	
+class EndGame(webapp.RequestHandler):
+  def get(self):
+    game_name = self.request.get('game_name')
+    missions = Mission.in_game(game_name).fetch(None)
+    db.delete(missions)
 
 class StartGame(webapp.RequestHandler):
   def get(self):
     game_name = self.request.get('game_name')
-    started = Mission.in_game(game_name).filter('timestamp !=', None).count()
+    started = Mission.in_game(game_name).count()
     if started:
       self.response.out.write("Already started")
       return
 
-    missions = Mission.in_game(game_name).fetch(None)
-    victims = [ mission.assassin for mission in missions ]
-    shuffle(victims)
+    users = Player.in_game(game_name).fetch(None)
+    players = [ player.nickname for player in users ]
+    shuffle(players)
 
-    for mission in missions:
-      victim = victims.pop()
-      while victim == mission.victim:
-        victims.insert(0, victim)
-        victim = victims.pop()
-      mission.victim = victim
-      mission.put()
+    assassin = players[len(players) - 1]
+    for player in players:
+      Mission.create(game_name, assassin, player)
+      assassin = player
     self.response.out.write("Done")
+    

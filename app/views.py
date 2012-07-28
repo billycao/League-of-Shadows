@@ -72,3 +72,23 @@ class JoinGame(webapp.RequestHandler):
     else:
       url = users.create_login_url(self.request.uri)
       self.response.out.write("<a href=\"%s\">Login</a>" % url)
+      
+class Kill(webapp.RequestHandler):
+  def get(self):
+    game_name = self.request.get('game_name')
+    code = self.request.get('code')
+
+    if users.get_current_user():
+      mission = Mission.in_game(game_name).filter(
+        'assassin =', users.get_current_user().nickname()).get()
+      if mission.code == code:
+        mission.finish(1)  # Finish the mission with success
+        
+class Die(webapp.RequestHandler):
+  def get(self):
+    game_name = self.request.get('game_name')
+    
+    if users.get_current_user():
+      mission = Mission.in_game(game_name).filter(
+        'victim =', users.get_current_user().nickname()).get()
+      mission.finish(0)  # Commit suicide
