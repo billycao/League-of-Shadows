@@ -24,12 +24,12 @@ class EndGame(webapp.RequestHandler):
     game_name = self.request.get('game_name')
     missions = Mission.in_game(game_name).fetch(None)
     db.delete(missions)
+    self.response.out.write("Done")
 
 class StartGame(webapp.RequestHandler):
   def get(self):
     game_name = self.request.get('game_name')
-    started = Mission.in_game(game_name).count()
-    if started:
+    if Game.has_started(game_name):
       self.response.out.write("Already started")
       return
 
@@ -39,7 +39,10 @@ class StartGame(webapp.RequestHandler):
 
     assassin = players[len(players) - 1]
     for player in players:
-      Mission.create(game_name, assassin, player)
+      mission = Mission(parent=game_key(game_name))
+      mission.assassin = assassin
+      mission.victim = player
+      mission.put()
       assassin = player
     self.response.out.write("Done")
     

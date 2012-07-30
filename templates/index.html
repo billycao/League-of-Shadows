@@ -15,20 +15,29 @@
         game for the summer MTV interns of 2012</h2>
 </div>
 
-<!-- TODO(billycao): Add wrapper/styles for this -->
+{# TODO(billycao): Add wrapper/styles for this #}
 {% if FLAGS_show_game_title  %}
     <h1>Game: {{ curr_game }}</h1>
 {% endif %}
 
-<!--
+{% if game_started %}
 <div id="status">
-    Your target is {{ target_mission.victim|default:"unassigned" }}.
+  {% if winner %}
+      {{ winner.assassin }} won.
+  {% else %}{% if target_mission %}
+      Your target is <strong>{{ target_mission.victim|default:"unassigned" }}</strong>.
+      <form id="killform" action="/kill" method="post">
+        <input type="text" id="killcode" name="killcode" />
+        <label for="killcode">Press 'Enter' to submit your kill code.</label>
+      </form>
+  {% else %}
+      You are dead. :(
+  {% endif %}{% endif %}
 </div>
--->
-
+{% else %}
 <div id="countdown_wrapper">
 	<div id="countdown"></div>
-	<p id="note"></p>
+	<p id="note" class="note"></p>
 </div>
 
 <div id="register_wrapper">
@@ -41,7 +50,7 @@
             <fieldset>
                 Are you an intern? What are you waiting for? <br />
                 Join the other <b>{{ num_players }}</b> assassin{{ num_players|pluralize }}!<br />
-                <!-- TODO(billycao): Make this system work for multiple games. -->
+                {# TODO(billycao): Make this system work for multiple games. #}
                 <select name="game_name" hidden>
                     {% for game in games %}
                         <option>{{ game.key.name }}</option>
@@ -53,6 +62,7 @@
         </form>
     {% endif %}
 </div>
+{% endif %}
 
 <div id="columns_wrapper">
     <div id="column_left">
@@ -95,6 +105,18 @@ jQuery(function() {
             $('#note').html(message);
         }
     });
+    
+    var killform = $('#killform');
+    if (killform.length) {
+      killform.submit(function() {
+        $.post(killform.attr('action'), killform.serialize(), function(data) {
+          alert(data);
+        });
+        killform.children('#killcode').val('');
+        return false;
+      });
+    }
+    $('#killcode').focus();
 });
 </script>
 </body>
