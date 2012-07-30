@@ -1,5 +1,6 @@
 ﻿#!/usr/bin/env python
 
+import uuid
 from google.appengine.ext import db
 from datetime import datetime
 
@@ -16,8 +17,6 @@ class Mission(db.Model):
           self.assassin,
           self.victim,
           self.timestamp.strftime('%a, %d %b %Y'))
-    elif self.victim == 'Billy':
-      print 'Billy is a n00b'
     else:
       return "%s's current target is %s" % (
           self.assassin,
@@ -87,6 +86,14 @@ class Player(db.Model):
   def get(game_name, name):
     return Player.all().ancestor(game_key(game_name)).filter(
       "nickname = ", name).get()
+
+  @staticmethod
+  def newcode():
+    killcode = uuid.uuid4().hex[:6]
+    while Player.all().filter('code =',killcode).count():
+      killcode = uuid.uuid4().hex[:6]
+    return killcode.upper()
+
 
 def game_key(game_name=None):
   """Constructs a Datastore key for a Mission entity given an assassin."""
