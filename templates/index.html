@@ -28,23 +28,28 @@
 
     {% if not is_registered %}
     <div id="register_wrapper">
-            <form action="/join" method="post">
-                <fieldset>
-                    Are you an intern? What are you waiting for? <br />
-                    Join the other <b>{{ num_players }}</b> assassin{{ num_players|pluralize }}!<br />
-                    {# TODO(billycao): Make this system work for multiple games. #}
-                    <input name="game_name" value="{{ game_name }}" hidden/>
-                    <!--
-                    <select name="game_name" hidden>
-                        {% for game in games %}
-                            <option>{{ game.key.name }}</option>
-                        {% endfor %}
-                    </select>
-                    -->
-                    <input class="big_button" type="submit" value="Join the fray!"><br />
-                    <small>Your username <b>{{ player_name }}</b> will be recorded.</small>
-                </fieldset>
-            </form>
+        {% if num_players >= FLAGS_max_players %}
+            Sorry, but the maximum player count of {{ FLAGS_max_players }} has been reached.<br /><br />
+            Please check back soon, as there is a good chance we will raise this cap.
+        {% else %}
+        <form action="/join" method="post">
+            <fieldset>
+                Are you an intern? What are you waiting for? <br />
+                Join the other <b>{{ num_players }}</b> assassin{{ num_players|pluralize }}!<br />
+                {# TODO(billycao): Make this system work for multiple games. #}
+                <input name="game_name" value="{{ game_name }}" hidden/>
+                <!--
+                <select name="game_name" hidden>
+                    {% for game in games %}
+                        <option>{{ game.key.name }}</option>
+                    {% endfor %}
+                </select>
+                -->
+                <input class="big_button" type="submit" value="Join the fray!"><br />
+                <small>Your username <b>{{ player_name }}</b> will be recorded.</small>
+            </fieldset>
+        </form>
+        {% endif %}
     </div>
     {% endif %}
 {% else %}
@@ -61,6 +66,8 @@
             {{ winner.assassin }} won.
         {% else %}
             {% if target_mission %}
+                <strong>The games have begun!</strong>
+                <hr />
                 Your target is <strong>{{ target_mission.victim|default:"unassigned" }}</strong>.
                 <form id="killform" action="/kill" method="post">
                     <input type="text" id="killcode" name="killcode" />
@@ -73,11 +80,12 @@
                 </div>
                 <small>Hover to view. Click here to change it.</small>
             {% else %}
-                You are dead. :(
+                You are dead. :(<br />
+                <small>Think you died in error? Contact us below!</small>
             {% endif %}
         {% endif %}
     {% else %}
-        Welcome to the League, <strong>{{ player_name }}</strong>!
+        Welcome to the League!
         <hr />
         Your kill code is
         <div class="hidden_hover">
@@ -85,7 +93,9 @@
         </div>
         <small>Hover to view. Keep it hidden. Keep it safe.</small>
         <hr />
-        Please review the rules below, pick up your weapon from <b>MTV-42-132B</b>, and wait for your first target!
+        Please review the rules below, pick up your weapon from <b>MTV-42-132</b>, and wait for your first target!
+        <hr />
+        <small>{{ num_players|add:-1 }} other interns have joined.</small>
     {% endif %}
     </div>
 {% endif %}

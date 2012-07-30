@@ -58,7 +58,8 @@ class MainPage(webapp.RequestHandler):
       'player_name': player_name,
       'player_code': player_code,
       'winner': winner,
-      'FLAGS_show_game_title': os.environ['show_game_title'] == "True"
+      'FLAGS_show_game_title': os.environ['show_game_title'] == "True",
+      'FLAGS_max_players': int(os.environ['max_players'])
     }
     
     path = os.path.join(os.path.dirname(__file__)+ '/../templates/', 'index.html')
@@ -69,7 +70,9 @@ class JoinGame(webapp.RequestHandler):
   def post(self):
     game_name = self.request.get('game_name')
 
-    if users.get_current_user():
+    if Player.in_game(game_name).count() >= int(os.environ['max_players']):
+      self.response.out.write("The player maximum of " + os.environ['max_players'] + " has been reached.")
+    elif users.get_current_user():
       exists = Player.in_game(game_name).filter(
           'nickname =', users.get_current_user().nickname()).count()
       if not exists:
@@ -100,14 +103,14 @@ class Kill(webapp.RequestHandler):
         try:
           player.die(users.get_current_user().nickname())
           self.response.out.write("%s commited suicide." % player.nickname)
-        except AssassinationException as e:
+        except AssassinationException, e:
           self.response.out.write(e)
       elif victim.code.lower() == code:
         try:
           victim.die(users.get_current_user().nickname())
           self.response.out.write("%s killed %s" %
               (player.nickname, victim.nickname))
-        except AssassinationException as e:
+        except AssassinationException, e:
           self.response.out.write(e)
       else:
         self.response.out.write("Invalid code.")

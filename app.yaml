@@ -7,6 +7,8 @@ threadsafe: yes
 env_variables:
   # If true, show the title of the current game on the UI
   show_game_title: false
+  # Maximum number of players per game
+  max_players: 200
 
 handlers:
 - url: /favicon\.ico
@@ -24,6 +26,10 @@ handlers:
   script: main.py
   login: admin
   auth_fail_action: unauthorized
+
+- url: /appeng/.*
+  script: $PYTHON_LIB/google/appengine/ext/admin
+  login: admin
 
 - url: .*
   script: main.py
