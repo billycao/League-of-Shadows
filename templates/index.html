@@ -17,52 +17,79 @@
 
 {# TODO(billycao): Add wrapper/styles for this #}
 {% if FLAGS_show_game_title  %}
-    <h1>Game: {{ curr_game }}</h1>
+    <h1>Game: {{ game_name }}</h1>
 {% endif %}
 
-{% if game_started %}
-<div id="status">
-  {% if winner %}
-      {{ winner.assassin }} won.
-  {% else %}{% if target_mission %}
-      Your target is <strong>{{ target_mission.victim|default:"unassigned" }}</strong>.
-      <form id="killform" action="/kill" method="post">
-        <input type="text" id="killcode" name="killcode" />
-        <label for="killcode">Press 'Enter' to submit your kill code.</label>
-      </form>
-  {% else %}
-      You are dead. :(
-  {% endif %}{% endif %}
-</div>
-{% else %}
-<div id="countdown_wrapper">
-	<div id="countdown"></div>
-	<p id="note" class="note"></p>
-</div>
+{% if not game_started %}
+    <div id="countdown_wrapper">
+        <div id="countdown"></div>
+        <p id="note" class="note"></p>
+    </div>
 
-<div id="register_wrapper">
-    {% if is_registered %}
-        Congratulations! You've joined the game as <b>{{ user_name }}</b>.<br /><br />
-        Come back when the game begins for your first target!<br /><br/>
-        <b>{{ num_players|add:-1 }} other interns have joined you in the fray!</b>
-    {% else %}
-        <form action="/join" method="post">
-            <fieldset>
-                Are you an intern? What are you waiting for? <br />
-                Join the other <b>{{ num_players }}</b> assassin{{ num_players|pluralize }}!<br />
-                {# TODO(billycao): Make this system work for multiple games. #}
-                <select name="game_name" hidden>
-                    {% for game in games %}
-                        <option>{{ game.key.name }}</option>
-                    {% endfor %}
-                </select>
-                <input class="big_button" type="submit" value="Join the fray!"><br />
-                <small>Your username <b>{{ user_name }}</b> will be recorded.</small>
-            </fieldset>
-        </form>
+    {% if not is_registered %}
+    <div id="register_wrapper">
+            <form action="/join" method="post">
+                <fieldset>
+                    Are you an intern? What are you waiting for? <br />
+                    Join the other <b>{{ num_players }}</b> assassin{{ num_players|pluralize }}!<br />
+                    {# TODO(billycao): Make this system work for multiple games. #}
+                    <input name="game_name" value="{{ game_name }}" hidden/>
+                    <!--
+                    <select name="game_name" hidden>
+                        {% for game in games %}
+                            <option>{{ game.key.name }}</option>
+                        {% endfor %}
+                    </select>
+                    -->
+                    <input class="big_button" type="submit" value="Join the fray!"><br />
+                    <small>Your username <b>{{ player_name }}</b> will be recorded.</small>
+                </fieldset>
+            </form>
+    </div>
     {% endif %}
-</div>
+{% else %}
+    {% if not is_registered %}
+    Sorry! Registration has ended and the game is underway!<br /><br />
+    Check back soon for game results!
+    {% endif %}
 {% endif %}
+
+{% if is_registered %}
+    <div id="status">
+    {% if game_started %}
+        {% if winner %}
+            {{ winner.assassin }} won.
+        {% else %}
+            {% if target_mission %}
+                Your target is <strong>{{ target_mission.victim|default:"unassigned" }}</strong>.
+                <form id="killform" action="/kill" method="post">
+                    <input type="text" id="killcode" name="killcode" />
+                    <label for="killcode">Press 'Enter' to submit your kill code.</label>
+                </form>
+                <hr />
+                Your kill code is:<br />
+                <div class="hidden_hover">
+                    {{ player_code }}
+                </div>
+                <small>Hover to view. Click here to change it.</small>
+            {% else %}
+                You are dead. :(
+            {% endif %}
+        {% endif %}
+    {% else %}
+        Welcome to the League, <strong>{{ player_name }}</strong>!
+        <hr />
+        Your kill code is
+        <div class="hidden_hover">
+            {{ player_code }}
+        </div>
+        <small>Hover to view. Keep it hidden. Keep it safe.</small>
+        <hr />
+        Please review the rules below, pick up your weapon from <b>MTV-42-132B</b>, and wait for your first target!
+    {% endif %}
+    </div>
+{% endif %}
+
 
 <div id="columns_wrapper">
     <div id="column_left">
@@ -74,7 +101,10 @@
 </div>
 
 <div id="footer">
-    <a href="{{ url }}">{{ url_linktext }}</a>
+    <a href="{{ url }}">{{ url_linktext }}</a> |
+    <a href="mailto:billycao+league@google.com,nsolichin+league@google.com,shiryehoshua+league@google.com?subject=[League of Interns]" target="_blank">
+        Contact Us
+    </a>
 </div>
 
 </div> <!-- wrapper -->
@@ -85,11 +115,11 @@
 jQuery(function() {
     {% if is_registered %}
         // Show countdown to game start
-        var ts = new Date(2012, 7, 1, 10, 30).getTime();
+        var ts = new Date(2012, 7, 2, 11, 0).getTime();
         var event = "the games begin!";
     {% else %}
         // Show countdown to registration end
-        var ts = new Date(2012, 6, 31, 20, 00).getTime();
+        var ts = new Date(2012, 7, 2, 0, 0).getTime();
         var event = "registration ends!";
     {% endif %}
 
