@@ -64,11 +64,39 @@
 </div>
 {% endif %}
 
-<div id="columns_wrapper">
-    <div id="column_left">
+<div id="column_wrapper">
+    <div onclick="selectColumn('rules')"><div class="column_title"><h3><b>&raquo;</b> Rules</h3></div></div>
+    <div id="rules" class="column">
+        <i>How to play:</i>
+        <p>&nbsp;&nbsp;Assassins is a game of cleverness and stealth. You will be given a target, and your job is to eliminate that target by
+        clipping a hairpin onto their clothes. You will be given a kill code that the target must enter into this site once they are killed.
+        Otherwise, your kill will not be counted.</p>
+        <p>&nbsp;&nbsp;But don't relax too much -- there will be an assassin after you as well. If you are killed, be honorable and properly admit to your kill as soon as possible so that targets may be transferred.</p>
+        <p>&nbsp;&nbsp;Once a target is killed, that target's target will become the killer's new target. Targets will continue to be transferred until there is one person left.</p>
 
+        <ol>
+            <li>Do not disrupt others.</li>
+            <li>No indoor kills. Playing the game indoors is disruptful.</li>
+            <li>Do not hurt anyone, including your target.</li>
+            <li>Only target your own target.</li>
+            <li>Be honest. If you were killed, admit it.</li>
+        </ol>
+
+        If you are found breaking any of these rules, you may be disqualified.
     </div>
-    <div id="column_right">
+    <div onclick="selectColumn('faq')"><div class="column_title"><h3><b>&raquo;</b> FAQ</h3></div></div>
+    <div id="faq" class="column">
+        <b>Q: </b><i>How do I eliminate my target?</i><br />
+        <b>A: </b>Just clip them with your clothespin! However, be careful not to actually harm your victim, not to disrupt others, and review the rules.
+        </p>
+        <p>
+        <b>Q: </b><i>Where do I get a clothespin?</i><br />
+        <b>A: </b>You can either provide your own, or pick up your weapon from MTV-43-132. There should a few interns passing out clothespins. If not, simply take one from the bag. We recommend writing your kill code on it to make the game easier for everyone.
+        </p>
+        <p>
+        <b>Q: </b><i>Is there a prize?</i><br />
+        <b>A: </b>There will be a prize for the first place, as well as a badge for the top-ranking players. 
+        </p>
 
     </div>
 </div>
@@ -81,6 +109,7 @@
 <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
 <script type="text/javascript" src="/js/jquery.countdown.js"></script>
 <script type="text/javascript" src="/js/main.js"></script>
+<script type="text/javascript" src="/js/column.js"></script>
 <script type="text/javascript">
 jQuery(function() {
     {% if is_registered %}
