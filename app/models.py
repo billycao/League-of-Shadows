@@ -1,14 +1,13 @@
 ﻿#!/usr/bin/env python
 
 from google.appengine.ext import db
-from time import strftime
+from datetime import datetime
 
 class Mission(db.Model):
   """Models a mission for an assassin to kill a victim."""
   assassin = db.StringProperty()
   victim = db.StringProperty()
   timestamp = db.DateTimeProperty()
-  code = db.StringProperty()
   status = db.IntegerProperty()
 
   def __str__(self):
@@ -24,27 +23,8 @@ class Mission(db.Model):
           self.assassin,
           self.victim)
 
-  def success(self, success=0):
-    self.timestamp = datettime.now()
-    self.status = success
-    vmission = self.other_missions().filter(
-        'assassin =', self.victim).get()
-    vmission.timestamp = datetime.now()
-    vmission.status = 0
-
-    self.put()
-    vmission.put()
-    Mission.create(game_name, self.assassin, vmission.victim)
-
   def other_missions(self):
     return Mission.all().ancestor(self.parent_key())
-
-  @staticmethod   
-  def create(self, game_name, assassin, victim):
-    mission = Mission(parent=game_key(game_name))
-    mission.assassin = assassin
-    mission.victim = victim
-    mission.put()
 
   @staticmethod
   def in_game(game_name):
@@ -52,19 +32,61 @@ class Mission(db.Model):
   
 class Game(db.Model):
   """Models a game with a name"""
-  pass
+  @staticmethod
+  def has_started(game_name):
+    return Mission.in_game(game_name).count()
 
+class AssassinationException(Exception):
+  def __init__(self, value):
+    self.value = value
+  def __str__(self):
+    return repr(self.value)
+  
 class Player(db.Model):
   uid = db.StringProperty()
   nickname = db.StringProperty()
   email = db.StringProperty()
+  code = db.StringProperty()
 
   def other_players(self):
     return Player.all().ancestor(self.parent_key())
+    
+  def die(self, killer):
+    assassination = Mission.all().ancestor(self.parent_key()).filter(
+        "victim = ", self.nickname).filter("timestamp = ", None).get()
+    mission = Mission.all().ancestor(self.parent_key()).filter(
+        "assassin = ", self.nickname).filter("timestamp = ", None).get()
+    if not assassination or not mission:
+      raise AssassinationException("%s already dead." % self.nickname)
+        
+    if killer == self.nickname:
+      assassination.status = 0
+      mission.status = -1
+    elif killer == assassination.assassin:
+      assassination.status = 1
+      mission.status = -1
+    else:
+      raise AssassinationException("%s cannot kill %s." % (killer, self.nickname))
+    assassination.timestamp = datetime.now()
+    mission.timestamp = datetime.now()
+    assassination.put()
+    mission.put()
+    
+    newmission = Mission(parent=self.parent_key())
+    newmission.assassin = assassination.assassin
+    newmission.victim = mission.victim
+    if newmission.assassin == newmission.victim:
+      newmission.status = 9001
+    newmission.put()
 
   @staticmethod
   def in_game(game_name):
     return Player.all().ancestor(game_key(game_name))
+
+  @staticmethod
+  def get(game_name, name):
+    return Player.all().ancestor(game_key(game_name)).filter(
+      "nickname = ", name).get()
 
 def game_key(game_name=None):
   """Constructs a Datastore key for a Mission entity given an assassin."""

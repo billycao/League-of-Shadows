@@ -26,12 +26,13 @@ class MainPage(webapp.RequestHandler):
 
     # Game statistics
     num_players = Player.in_game(game_name).count()
+    winner = Mission.in_game(game_name).filter(
+        'status =', 9001).get()
 
     # Player stats
     is_registered = Player.in_game(game_name).filter(
         'nickname =', user_name).count()
-    target_mission = my_missions.order('timestamp').filter(
-        'timestamp =', None).get()
+    target_mission = my_missions.filter('timestamp =', None).get()
 
     if users.get_current_user():
       url = users.create_logout_url(self.request.uri)
@@ -42,6 +43,7 @@ class MainPage(webapp.RequestHandler):
 
     template_values = {
       'curr_game': game_name,
+      'game_started': Game.has_started(game_name),
       'games': games,
       'is_registered': is_registered,
       'num_players': num_players,
@@ -49,12 +51,14 @@ class MainPage(webapp.RequestHandler):
       'url': url,
       'url_linktext': url_linktext,
       'user_name': user_name,
+      'winner': winner,
       'FLAGS_show_game_title': os.environ['show_game_title'] == "True"
     }
     
     path = os.path.join(os.path.dirname(__file__)+ '/../templates/', 'index.html')
     self.response.out.write(template.render(path, template_values))
 
+    
 class JoinGame(webapp.RequestHandler):
   def post(self):
     game_name = self.request.get('game_name')
@@ -63,7 +67,8 @@ class JoinGame(webapp.RequestHandler):
       exists = Player.in_game(game_name).filter(
           'nickname =', users.get_current_user().nickname()).count()
       if not exists:
-        player = Player(parent=game_key(game_name))
+        player = Player(parent=game_key(game_name),
+            key_name=users.get_current_user().nickname())
         player.nickname = users.get_current_user().nickname()
         player.uid = users.get_current_user().user_id()
         player.email = users.get_current_user().email()
@@ -72,23 +77,30 @@ class JoinGame(webapp.RequestHandler):
     else:
       url = users.create_login_url(self.request.uri)
       self.response.out.write("<a href=\"%s\">Login</a>" % url)
-      
+        
 class Kill(webapp.RequestHandler):
-  def get(self):
+  def post(self):
     game_name = self.request.get('game_name')
-    code = self.request.get('code')
+    code = self.request.get('killcode').lower()
 
     if users.get_current_user():
+      player = Player.get(game_name, users.get_current_user().nickname())
       mission = Mission.in_game(game_name).filter(
-        'assassin =', users.get_current_user().nickname()).get()
-      if mission.code == code:
-        mission.finish(1)  # Finish the mission with success
-        
-class Die(webapp.RequestHandler):
-  def get(self):
-    game_name = self.request.get('game_name')
-    
-    if users.get_current_user():
-      mission = Mission.in_game(game_name).filter(
-        'victim =', users.get_current_user().nickname()).get()
-      mission.finish(0)  # Commit suicide
+        'assassin =', users.get_current_user().nickname()).filter('timestamp =', None).get()
+      victim = Player.get(game_name, mission.victim)
+      
+      if player.code.lower() == code:
+        try:
+          player.die(users.get_current_user().nickname())
+          self.response.out.write("%s commited suicide." % player.nickname)
+        except AssassinationException as e:
+          self.response.out.write(e)
+      elif victim.code.lower() == code:
+        try:
+          victim.die(users.get_current_user().nickname())
+          self.response.out.write("%s killed %s" %
+              (player.nickname, victim.nickname))
+        except AssassinationException as e:
+          self.response.out.write(e)
+      else:
+        self.response.out.write("Invalid code.")
