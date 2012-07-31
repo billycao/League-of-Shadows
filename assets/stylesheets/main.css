@@ -146,8 +146,8 @@ div#header {
 }
 
 .column {
-    /* height: 0; */
-    /* display: none; */
+    height: 0;
+    display: none;
     overflow: auto;
     padding: 5px 15px;
 }
