@@ -124,6 +124,7 @@ div#header {
 #wrapper #column_wrapper div {
     padding-top: 0;
     padding-bottom: 0;
+    overflow: hidden;
 }
 
 #wrapper #column_wrapper .column_title {
@@ -137,6 +138,8 @@ div#header {
     text-transform: uppercase;
     width: 400px;
     vertical-align: middle;
+    padding-top: 0;
+    padding-bottom: 0;
     -moz-user-select: none;
 }
 
