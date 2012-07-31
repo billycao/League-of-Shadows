@@ -86,6 +86,11 @@ div#wrapper {
     text-align: center;
 }
 
+div#wrapper div {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
 div#header {
     width: inherit;
     height: 150px;
@@ -112,11 +117,16 @@ div#header {
     color: #999;
 }
 
-#column_wrapper li {
+#wrapper #column_wrapper li {
     padding: 0;
 }
 
-.column_title {
+#wrapper #column_wrapper div {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+#wrapper #column_wrapper .column_title {
     color: #eee;
     cursor: pointer;
     display: table-cell;
@@ -136,8 +146,8 @@ div#header {
 }
 
 .column {
-    height: 0;
-    display: none;
+    /* height: 0; */
+    /* display: none; */
     overflow: auto;
     padding: 5px 15px;
 }
