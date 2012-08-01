@@ -3,7 +3,7 @@
  */
 
 
-var ContentHeight = 400;
+var ContentHeight = 420;
 var TimeToSlide = 200.0;
 
 var openColumn = '';
