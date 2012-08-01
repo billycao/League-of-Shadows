@@ -78,9 +78,9 @@
                 <div class="hidden_hover">
                     {{ player_code }}
                 </div>
-                <small>Hover to view. Click here to change it.</small>
+                <small>Hover to view. Keep it secret. Keep it safe.</small>
             {% else %}
-                You are dead. :(<br />
+                Oh no! You are dead. :(<br />
                 <small>Think you died in error? Contact us below!</small>
             {% endif %}
         {% endif %}
@@ -122,17 +122,21 @@
     <div onclick="selectColumn('faq')"><div class="column_title"><h3><b>&raquo;</b> FAQ</h3></div></div>
     <div id="faq" class="column">
         <b>Q: </b><i>How do I eliminate my target?</i><br />
-        <b>A: </b>Just clip them with your clothespin! However, be careful not to actually harm your victim, not to disrupt others, and review the rules.<br />
-	<p>When you get clipped, surrender your <strong>kill code</strong> so your death can be recorded.
+            <b>A: </b>Just clip them with your clothespin! However, be careful not to actually harm your victim, not to disrupt others, and review the rules.<br /><br />
+            When you get clipped, surrender your <strong>kill code</strong> so your death can be recorded.
         </p>
         <p>
-        <b>Q: </b><i>Where do I get a clothespin?</i><br />
-        <b>A: </b>You can either provide your own, or pick up your weapon from MTV-43-132. There should a few interns passing out clothespins. If not, simply take one from the bag. We recommend writing your kill code on it to make the game easier for everyone.
+            <b>Q: </b><i>Where do I get a clothespin?</i><br />
+            <b>A: </b>You can either provide your own, or pick up your weapon from MTV-43-132. There should a few interns passing out clothespins. If not, simply take one from the bag. We recommend writing your kill code on it to make it easy to remember.
         </p>
         <p>
-        <b>Q: </b><i>Is there a prize?</i><br />
-        <b>A: </b>There will be a prize for the last player (and/or the individual(s) with the most kills), as well as a badge for the top-ranking players.<br />
-	<p>More info soon!</p> 
+            <b>Q: </b><i>Are there prizes?</i><br />
+            <b>A: </b>There will be a prizes for the last player alive (and/or the individual(s) with the most kills), as well as a badge for the top-ranking players.<br /><br />
+            Stay tuned for more info!
+        </p>
+        <p>
+            <b>Q: </b><i>I don't want to/can't play anymore!</i><br />
+            <b>A: </b>No problem! Commit suicide by <strong>entering your own kill code</strong>. Beware though, you can't undo this!
         </p>
     </div>
 </div>
@@ -173,16 +177,37 @@ jQuery(function() {
             $('#note').html(message);
         }
     });
-    
+
+    // Killform JS Handlers
     var killform = $('#killform');
     if (killform.length) {
-      killform.submit(function() {
-        $.post(killform.attr('action'), killform.serialize(), function(data) {
-          alert(data);
+        killform.submit(function() {
+            var killcode = killform.children('#killcode').val();
+            var playercode = "{{ player_code }}"
+            if (killcode.toLowerCase() == playercode.toLowerCase()) {
+                if (confirm('Are you sure you want to commit suicide?')) {
+                    $.post(killform.attr('action'), killform.serialize(), function(data) {
+                        if (data == "true") {
+                            alert("You've committed suicide!");
+                            document.location.reload(true);
+                        } else {
+                            alert(data);
+                        }
+                    });
+                }
+            } else {
+                $.post(killform.attr('action'), killform.serialize(), function(data) {
+                    if (data == "Invalid Code.") {
+                        alert(data);
+                    } else {
+                        alert(data);
+                        document.location.reload(true);
+                    }
+                });
+            }
+            killform.children('#killcode').val('');
+            return false;
         });
-        killform.children('#killcode').val('');
-        return false;
-      });
     }
     $('#killcode').focus();
 });

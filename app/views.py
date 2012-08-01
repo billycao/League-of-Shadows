@@ -92,6 +92,7 @@ class Kill(webapp.RequestHandler):
   def post(self):
     game_name = self.request.get('game_name')
     code = self.request.get('killcode').lower()
+    ksuccesstext = "true"
 
     if users.get_current_user():
       player = Player.get(game_name, users.get_current_user().nickname())
@@ -102,14 +103,13 @@ class Kill(webapp.RequestHandler):
       if player.code.lower() == code:
         try:
           player.die(users.get_current_user().nickname())
-          self.response.out.write("%s commited suicide." % player.nickname)
+          self.response.out.write(ksuccesstext)
         except AssassinationException, e:
           self.response.out.write(e)
       elif victim.code.lower() == code:
         try:
           victim.die(users.get_current_user().nickname())
-          self.response.out.write("%s killed %s" %
-              (player.nickname, victim.nickname))
+          self.response.out.write("Congratulations! You've killed %s!" % victim.nickname)
         except AssassinationException, e:
           self.response.out.write(e)
       else:
