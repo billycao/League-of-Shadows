@@ -60,14 +60,16 @@
 {% endif %}
 
 {% if is_registered %}
-    <div id="stats_wrapper" class="container" style="width: {{ stats_list_width }}px">
-        {% for statname, statnum in stats_list %}
-            <div class="stat">
-                <p class="statnum">{{ statnum }}</p>
-                <p class="statname">{{ statname }}</p>
-            </div>
-        {% endfor %}
-    </div>
+    {% if game_started %}
+        <div id="stats_wrapper" class="container" style="width: {{ stats_list_width }}px">
+            {% for statname, statnum in stats_list %}
+                <div class="stat">
+                    <p class="statnum">{{ statnum }}</p>
+                    <p class="statname">{{ statname }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
     <div id="status">
     {% if game_started %}
         {% if winner %}
@@ -164,7 +166,7 @@
         </p>
         <p>
             <b>Q: </b><i>I don't want to/can't play anymore!</i><br />
-            <b>A: </b>No problem! Commit suicide by <strong>entering your own kill code</strong>. Beware though, you can't undo this!
+            <b>A: </b>No problem! Commit suicide by <strong>entering your own kill code</strong>. Your kills will still be tallied for prizes.Beware though, you can't undo this!
         </p>
         <p>
             <b>Q: </b><i>I've died, what now?</i><br />
