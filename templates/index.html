@@ -63,10 +63,11 @@
     <div id="status">
     {% if game_started %}
         {% if winner %}
-            {{ winner.assassin }} won.
+            {{ winner.assassin }} is the last assassin standing!<br /><br />
+            Stay tuned as we announce other winners, top players, and stats on this site!
         {% else %}
             {% if target_mission %}
-                <strong>The games have begun!</strong>
+                <h3>The games have begun!</h3>
                 <hr />
                 Your target is <strong>{{ target_mission.victim|default:"unassigned" }}</strong>.
                 <form id="killform" action="/kill" method="post">
@@ -80,12 +81,27 @@
                 </div>
                 <small>Hover to view. Keep it secret. Keep it safe.</small>
             {% else %}
-                Oh no! You are dead. :(<br />
+                Oh no! You've died! :(<br />
+                {% if is_suicide %}
+                    <small>It appears you've committed suicide!</small>
+                {% else %}
+                    <small>{{ death_mission.assassin }} has eliminated you!</small>
+                {% endif %}
+                <hr />
+                <h3>Terminator System</h3>
+                <small>Coming soon!</small>
+                <!--
+                <form id="killform" action="/kill" method="post">
+                    <input type="text" id="killcode" name="killcode" />
+                    <label for="killcode">Press 'Enter' to submit your kill code.</label>
+                </form>
+                -->
+                <hr />
                 <small>Think you died in error? Contact us below!</small>
             {% endif %}
         {% endif %}
     {% else %}
-        Welcome to the League!
+        <h3>Welcome to the League!</h3>
         <hr />
         Your kill code is
         <div class="hidden_hover">
@@ -137,6 +153,10 @@
         <p>
             <b>Q: </b><i>I don't want to/can't play anymore!</i><br />
             <b>A: </b>No problem! Commit suicide by <strong>entering your own kill code</strong>. Beware though, you can't undo this!
+        </p>
+        <p>
+            <b>Q: </b><i>I've died, what now?</i><br />
+            <b>A: </b>The game still isn't over! We're working on a <strong>Terminator</strong> system that will list idle assassins (those that haven't killed anyone in 3 days) to be killed by <em>anyone</em>.
         </p>
     </div>
 </div>

@@ -34,10 +34,18 @@ class MainPage(webapp.RequestHandler):
         'nickname =', player_name).count()
     player_code = ''
     target_mission = None
+    death_mission = None
+    is_suicide = False
     if is_registered:
         player_code = Player.in_game(game_name).filter(
             'nickname =', player_name).get().code
         target_mission = my_missions.filter('timestamp =', None).get()
+        if target_mission is None:
+          death_mission = Mission.in_game(game_name).filter(
+            'victim =', player_name).get()
+          is_suicide = Mission.in_game(game_name)\
+                              .filter('assassin =', player_name)\
+                              .get().status == -1
 
     if users.get_current_user():
       url = users.create_logout_url(self.request.uri)
@@ -51,8 +59,10 @@ class MainPage(webapp.RequestHandler):
       'game_started': Game.has_started(game_name),
       'games': games,
       'is_registered': is_registered,
+      'is_suicide': is_suicide,
       'num_players': num_players,
       'target_mission': target_mission,
+      'death_mission': death_mission,
       'url': url,
       'url_linktext': url_linktext,
       'player_name': player_name,
