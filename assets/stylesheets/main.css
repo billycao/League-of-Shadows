@@ -74,6 +74,20 @@ fieldset {
     border: 0;
 }
 
+/* For modern browsers */
+.container:before,
+.container:after {
+    content:"";
+    display:table;
+}
+.container:after {
+    clear:both;
+}
+/* For IE 6/7 (trigger hasLayout) */
+.container {
+    zoom:1;
+}
+
 /*
  * Main Page structure
  */
@@ -86,7 +100,7 @@ div#wrapper {
     text-align: center;
 }
 
-div#wrapper div {
+#wrapper div {
     padding-top: 10px;
     padding-bottom: 10px;
 }
@@ -182,6 +196,23 @@ div#header {
   border-width: 1px 0 0 1px;
   padding: 15px 10px;
   color: #CECECE;
+}
+
+#wrapper #stats_wrapper {
+    margin: auto;
+    padding-bottom: 20px;
+}
+#stats_wrapper .stat {
+    width: 120px;
+    float: left;
+    padding: 0;
+}
+
+#stats_wrapper .stat .statnum {
+    font-size: 30px;
+    font-weight: bold;
+    padding: 5px 0;
+    margin: 0;
 }
 
 #status strong {

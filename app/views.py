@@ -13,6 +13,7 @@ class MainPage(webapp.RequestHandler):
   def get(self):
     game_name = self.request.get('game_name') or 'MTV'
     player_name = users.get_current_user().nickname()
+    game_started = Game.has_started(game_name)
 
     games = Game.all()
     if not games.count():
@@ -25,9 +26,20 @@ class MainPage(webapp.RequestHandler):
         'assassin =', player_name)
 
     # Game statistics
+    stats_list = []
     num_players = Player.in_game(game_name).count()
+    num_players_dead = Mission.in_game(game_name).filter('status =', 1).count() +\
+                       Mission.in_game(game_name).filter('status =', 0).count()
+    num_kills = Mission.in_game(game_name)\
+                       .filter('assassin =', player_name)\
+                       .filter('status =', 1)\
+                       .count()
     winner = Mission.in_game(game_name).filter(
         'status =', 9001).get()
+
+    stats_list.append(('Total Players', num_players))
+    stats_list.append(('Players Dead', num_players_dead))
+    stats_list.append(('Your Kills', num_kills))
 
     # Player stats
     is_registered = Player.in_game(game_name).filter(
@@ -40,7 +52,8 @@ class MainPage(webapp.RequestHandler):
         player_code = Player.in_game(game_name).filter(
             'nickname =', player_name).get().code
         target_mission = my_missions.filter('timestamp =', None).get()
-        if target_mission is None:
+        if game_started and target_mission is None:
+          # Player must have died
           death_mission = Mission.in_game(game_name).filter(
             'victim =', player_name).get()
           is_suicide = Mission.in_game(game_name)\
@@ -56,13 +69,15 @@ class MainPage(webapp.RequestHandler):
 
     template_values = {
       'game_name': game_name,
-      'game_started': Game.has_started(game_name),
+      'game_started': game_started,
       'games': games,
       'is_registered': is_registered,
       'is_suicide': is_suicide,
       'num_players': num_players,
       'target_mission': target_mission,
       'death_mission': death_mission,
+      'stats_list': stats_list,
+      'stats_list_width': len(stats_list) * 120,
       'url': url,
       'url_linktext': url_linktext,
       'player_name': player_name,

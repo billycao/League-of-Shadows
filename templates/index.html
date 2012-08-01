@@ -60,11 +60,19 @@
 {% endif %}
 
 {% if is_registered %}
+    <div id="stats_wrapper" class="container" style="width: {{ stats_list_width }}px">
+        {% for statname, statnum in stats_list %}
+            <div class="stat">
+                <p class="statnum">{{ statnum }}</p>
+                <p class="statname">{{ statname }}</p>
+            </div>
+        {% endfor %}
+    </div>
     <div id="status">
     {% if game_started %}
         {% if winner %}
-            {{ winner.assassin }} is the last assassin standing!<br /><br />
-            Stay tuned as we announce other winners, top players, and stats on this site!
+            <strong>{{ winner.assassin }} is the last assassin standing!</strong><br /><br />
+            Stay tuned as we announce the winners, top players, and stats!
         {% else %}
             {% if target_mission %}
                 <h3>The games have begun!</h3>
@@ -79,7 +87,7 @@
                 <div class="hidden_hover">
                     {{ player_code }}
                 </div>
-                <small>Hover to view. Keep it secret. Keep it safe.</small>
+                <small>Remember it, and surrender it upon death.</small>
             {% else %}
                 Oh no! You've died! :(<br />
                 {% if is_suicide %}
@@ -146,8 +154,12 @@
             <b>A: </b>You can either provide your own, or pick up your weapon from MTV-43-132. There should a few interns passing out clothespins. If not, simply take one from the bag. We recommend writing your kill code on it to make it easy to remember.
         </p>
         <p>
+            <b>Q: </b><i>How long will the game last?</i><br />
+            <b>A: </b>The game will last until <strong>Midnight, Friday, Aug. 31st</strong>. A countdown will appear during the last week.
+        </p>
+        <p>
             <b>Q: </b><i>Are there prizes?</i><br />
-            <b>A: </b>There will be a prizes for the last player alive (and/or the individual(s) with the most kills), as well as a badge for the top-ranking players.<br /><br />
+            <b>A: </b>There will be prizes for the last player alive (and/or the individual(s) with the most kills), as well as a badge for the top-ranking players.<br /><br />
             Stay tuned for more info!
         </p>
         <p>
@@ -176,9 +188,15 @@
 <script type="text/javascript">
 jQuery(function() {
     {% if is_registered %}
-        // Show countdown to game start
-        var ts = new Date(2012, 7, 2, 11, 0).getTime();
-        var event = "the games begin!";
+        {% if game_started %}
+            // Show countdown to game end
+            var ts = new Date(2012, 8, 31, 24, 0).getTime();
+            var event = "the game ends!";
+        {% else %}
+            // Show countdown to game start
+            var ts = new Date(2012, 7, 2, 11, 0).getTime();
+            var event = "the games begin!";
+        {% endif %}
     {% else %}
         // Show countdown to registration end
         var ts = new Date(2012, 7, 2, 0, 0).getTime();
