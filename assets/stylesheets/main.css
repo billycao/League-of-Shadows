@@ -4,12 +4,11 @@
 
 html, body {
     margin: 0; padding: 0;
-    height: 100%;
+    min-height: 100%;
 }
 
 html {
     position: relative;
-    height: 100%;
 }
 
 body {
@@ -22,6 +21,8 @@ body {
     background: -ms-radial-gradient(center bottom, ellipse cover,  #8baeb2 0%,#516066 100%); /* IE10+ */
     background: radial-gradient(ellipse at center bottom,  #8baeb2 0%,#516066 100%); /* W3C */
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#8baeb2', endColorstr='#516066',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+    background-repeat: no-repeat;
+    background-attachment: fixed;
     font-family: Arial, Helvetica, Verdana, sans-serif;
     font-size: 14px;
     line-height: 18px;
@@ -49,7 +50,8 @@ h1 {
     font-weight: normal;
     font-size: 44px;
     font-weight: bold;
-    color: #fff;
+    text-transform: uppercase;
+    color: #eee;
     text-shadow: 4px 4px 2px rgba(60, 60, 60, 0.8);
 }
 
@@ -72,6 +74,20 @@ fieldset {
     border: 0;
 }
 
+/* For modern browsers */
+.container:before,
+.container:after {
+    content:"";
+    display:table;
+}
+.container:after {
+    clear:both;
+}
+/* For IE 6/7 (trigger hasLayout) */
+.container {
+    zoom:1;
+}
+
 /*
  * Main Page structure
  */
@@ -84,14 +100,70 @@ div#wrapper {
     text-align: center;
 }
 
-div#wrapper div {
-    padding: 15px 0;
+#wrapper div {
+    padding-top: 10px;
+    padding-bottom: 10px;
 }
 
 div#header {
     width: inherit;
     height: 150px;
     margin: 0 0 -50px;
+}
+
+#column_wrapper {
+    background: #333;
+    border-radius: 5px;
+    color: #ccc;
+    font-size: 12px;
+    display: inline-block;
+    position: relative;
+    text-align: left;
+    width: 400px;
+    margin: 15px;
+}
+
+#column_wrapper b {
+    color: #990000;
+}
+
+#column_wrapper i {
+    color: #999;
+}
+
+#wrapper #column_wrapper li {
+    padding: 0;
+}
+
+#wrapper #column_wrapper div {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+#wrapper #column_wrapper .column_title {
+    color: #eee;
+    cursor: pointer;
+    display: table-cell;
+    height: 5px;
+    overflow: hidden;
+    padding: 0 5px;
+    position: relative;
+    text-transform: uppercase;
+    width: 400px;
+    vertical-align: middle;
+    -moz-user-select: none;
+}
+
+.column_title:hover {
+    background: #444;
+    border-radius: 5px;
+}
+
+.column {
+    height: 0;
+    display: none;
+    overflow: auto;
+    padding: 5px 15px;
 }
 
 #note {
@@ -104,7 +176,7 @@ div#header {
 	width: 400px;
 }
 
-#status {
+#wrapper #status {
   background: #686868; /* Old browsers */
   background: -moz-linear-gradient(-45deg,  #686868 0%, #4f4f4f 100%); /* FF3.6+ */
   background: -webkit-gradient(linear, left top, right bottom, color-stop(0%,#686868), color-stop(100%,#4f4f4f)); /* Chrome,Safari4+ */
@@ -122,8 +194,25 @@ div#header {
   box-shadow: 1px 1px 5px 2px rgba(0, 0, 0, .9);
   border: 1px solid #777777;
   border-width: 1px 0 0 1px;
-  padding: 5px;
+  padding: 15px 10px;
   color: #CECECE;
+}
+
+#wrapper #stats_wrapper {
+    margin: auto;
+    padding-bottom: 20px;
+}
+#stats_wrapper .stat {
+    width: 120px;
+    float: left;
+    padding: 0;
+}
+
+#stats_wrapper .stat .statnum {
+    font-size: 30px;
+    font-weight: bold;
+    padding: 5px 0;
+    margin: 0;
 }
 
 #status strong {
@@ -134,6 +223,25 @@ div#header {
   display: block;
   color: #AAAAAA;
   font-size: 12px;
+}
+
+#status hr {
+    width: 250px;
+}
+
+#wrapper #status .hidden_hover {
+    margin: 5px 0;
+    padding: 5px;
+    color: #666;
+    background: #666;
+}
+
+#wrapper #status .hidden_hover:hover {
+    font-weight: bold;
+    margin: 5px 0;
+    padding: 5px;
+    color: inherit;
+    background: none;
 }
 
 /*

@@ -5,7 +5,7 @@
 <link type="text/css" rel="stylesheet" href="/stylesheets/main.css" />
 <link type="text/css" rel="stylesheet" href="/stylesheets/jquery.countdown.css" />
 </head>
-<body>
+<body onload="selectColumn('rules')">
 
 <div id="wrapper">
 
@@ -17,79 +17,191 @@
 
 {# TODO(billycao): Add wrapper/styles for this #}
 {% if FLAGS_show_game_title  %}
-    <h1>Game: {{ curr_game }}</h1>
+    <h1>Game: {{ game_name }}</h1>
 {% endif %}
 
-{% if game_started %}
-<div id="status">
-  {% if winner %}
-      {{ winner.assassin }} won.
-  {% else %}{% if target_mission %}
-      Your target is <strong>{{ target_mission.victim|default:"unassigned" }}</strong>.
-      <form id="killform" action="/kill" method="post">
-        <input type="text" id="killcode" name="killcode" />
-        <label for="killcode">Press 'Enter' to submit your kill code.</label>
-      </form>
-  {% else %}
-      You are dead. :(
-  {% endif %}{% endif %}
-</div>
-{% else %}
-<div id="countdown_wrapper">
-	<div id="countdown"></div>
-	<p id="note" class="note"></p>
-</div>
+{% if not game_started %}
+    <div id="countdown_wrapper">
+        <div id="countdown"></div>
+        <p id="note" class="note"></p>
+    </div>
 
-<div id="register_wrapper">
-    {% if is_registered %}
-        Congratulations! You've joined the game as <b>{{ user_name }}</b>.<br /><br />
-        Come back when the game begins for your first target!<br /><br/>
-        <b>{{ num_players|add:-1 }} other interns have joined you in the fray!</b>
-    {% else %}
+    {% if not is_registered %}
+    <div id="register_wrapper">
+        {% if num_players >= FLAGS_max_players %}
+            Sorry, but the maximum player count of {{ FLAGS_max_players }} has been reached.<br /><br />
+            Please check back soon, as there is a good chance we will raise this cap.
+        {% else %}
         <form action="/join" method="post">
             <fieldset>
                 Are you an intern? What are you waiting for? <br />
                 Join the other <b>{{ num_players }}</b> assassin{{ num_players|pluralize }}!<br />
                 {# TODO(billycao): Make this system work for multiple games. #}
+                <input name="game_name" value="{{ game_name }}" hidden/>
+                <!--
                 <select name="game_name" hidden>
                     {% for game in games %}
                         <option>{{ game.key.name }}</option>
                     {% endfor %}
                 </select>
+                -->
                 <input class="big_button" type="submit" value="Join the fray!"><br />
-                <small>Your username <b>{{ user_name }}</b> will be recorded.</small>
+                <small>Your username <b>{{ player_name }}</b> will be recorded.</small>
             </fieldset>
         </form>
+        {% endif %}
+    </div>
     {% endif %}
-</div>
+{% else %}
+    {% if not is_registered %}
+    Sorry! Registration has ended and the game is underway!<br /><br />
+    Check back soon for game results!
+    {% endif %}
 {% endif %}
 
-<div id="columns_wrapper">
-    <div id="column_left">
-
+{% if is_registered %}
+    {% if game_started %}
+        <div id="stats_wrapper" class="container" style="width: {{ stats_list_width }}px">
+            {% for statname, statnum in stats_list %}
+                <div class="stat">
+                    <p class="statnum">{{ statnum }}</p>
+                    <p class="statname">{{ statname }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    <div id="status">
+    {% if game_started %}
+        {% if winner %}
+            <strong>{{ winner.assassin }} is the last assassin standing!</strong><br /><br />
+            Stay tuned as we announce the winners, top players, and stats!
+        {% else %}
+            {% if target_mission %}
+                <h3>The games have begun!</h3>
+                <hr />
+                Your target is <strong>{{ target_mission.victim|default:"unassigned" }}</strong>.
+                <form id="killform" action="/kill" method="post">
+                    <input type="text" id="killcode" name="killcode" />
+                    <label for="killcode">Press 'Enter' to submit your kill code.</label>
+                </form>
+                <hr />
+                Your kill code is:<br />
+                <div class="hidden_hover">
+                    {{ player_code }}
+                </div>
+                <small>Remember it, and surrender it upon death.</small>
+            {% else %}
+                Oh no! You've died! :(<br />
+                {% if is_suicide %}
+                    <small>It appears you've committed suicide!</small>
+                {% else %}
+                    <small>{{ death_mission.assassin }} has eliminated you!</small>
+                {% endif %}
+                <hr />
+                <h3>Terminator System</h3>
+                <small>Coming soon!</small>
+                <!--
+                <form id="killform" action="/kill" method="post">
+                    <input type="text" id="killcode" name="killcode" />
+                    <label for="killcode">Press 'Enter' to submit your kill code.</label>
+                </form>
+                -->
+                <hr />
+                <small>Think you died in error? Contact us below!</small>
+            {% endif %}
+        {% endif %}
+    {% else %}
+        <h3>Welcome to the League!</h3>
+        <hr />
+        Your kill code is
+        <div class="hidden_hover">
+            {{ player_code }}
+        </div>
+        <small>Hover to view. Keep it hidden. Keep it safe.</small>
+        <hr />
+        Please review the rules below, pick up your weapon from <b>MTV-43-132</b>, and wait for your first target!
+        <hr />
+        <small>{{ num_players|add:-1 }} other interns have joined.</small>
+    {% endif %}
     </div>
-    <div id="column_right">
+{% endif %}
 
+<div id="column_wrapper">
+    <div onclick="selectColumn('rules')"><div class="column_title"><h3><b>&raquo;</b> Rules</h3></div></div>
+    <div id="rules" class="column">
+        <i>How to play:</i>
+        <p>&nbsp;&nbsp;Assassins is a game of cleverness and stealth. You will be given a target, and your job is to eliminate that target by
+        clipping a clothespin onto their clothes. They will give you a kill code that you must enter into this site once they are killed.
+        Otherwise, your kill will not be counted.</p>
+        <p>&nbsp;&nbsp;But don't relax too much -- there will be an assassin after you as well. If you are killed, be honorable and properly admit to your kill as soon as possible so that targets may be transferred.</p>
+        <p>&nbsp;&nbsp;Once a target is killed, that target's target will become the killer's new target. Targets will continue to be transferred until there is one person left.</p>
+        <ol>
+            <li>Do not disrupt others.</li>
+            <li><strong>No indoor kills</strong>. Playing the game indoors is disruptful.</li>
+            <li>Do not hurt anyone, including your target.</li>
+            <li>Only target your own target.</li>
+            <li>Be honest. If you were killed, surrender your kill code.</li>
+        </ol>
+
+        If you are found breaking any of these rules, you may be disqualified.
+    </div>
+    <div onclick="selectColumn('faq')"><div class="column_title"><h3><b>&raquo;</b> FAQ</h3></div></div>
+    <div id="faq" class="column">
+        <b>Q: </b><i>How do I eliminate my target?</i><br />
+            <b>A: </b>Just clip them with your clothespin! However, be careful not to actually harm your victim, not to disrupt others, and review the rules.<br /><br />
+            When you get clipped, surrender your <strong>kill code</strong> so your death can be recorded.
+        </p>
+        <p>
+            <b>Q: </b><i>Where do I get a clothespin?</i><br />
+            <b>A: </b>You can either provide your own, or pick up your weapon from MTV-43-132. There should a few interns passing out clothespins. If not, simply take one from the bag. We recommend writing your kill code on it to make it easy to remember.
+        </p>
+        <p>
+            <b>Q: </b><i>How long will the game last?</i><br />
+            <b>A: </b>The game will last until <strong>Midnight, Friday, Aug. 31st</strong>. A countdown will appear during the last week.
+        </p>
+        <p>
+            <b>Q: </b><i>Are there prizes?</i><br />
+            <b>A: </b>There will be prizes for the last player alive (and/or the individual(s) with the most kills), as well as a badge for the top-ranking players.<br /><br />
+            Stay tuned for more info!
+        </p>
+        <p>
+            <b>Q: </b><i>I don't want to/can't play anymore!</i><br />
+            <b>A: </b>No problem! Commit suicide by <strong>entering your own kill code</strong>. Your kills will still be tallied for prizes. Beware though, you can't undo this!
+        </p>
+        <p>
+            <b>Q: </b><i>I've died, what now?</i><br />
+            <b>A: </b>The game still isn't over! We're working on a <strong>Terminator</strong> system that will list idle assassins (those that haven't killed anyone in 3 days) to be killed by <em>anyone</em>.
+        </p>
     </div>
 </div>
 
 <div id="footer">
-    <a href="{{ url }}">{{ url_linktext }}</a>
+    <a href="{{ url }}">{{ url_linktext }}</a> |
+    <a href="mailto:billycao+league@google.com,nsolichin+league@google.com,shiryehoshua+league@google.com,tinaroh+league@google.com?subject=[League of Interns]" target="_blank">
+        Contact Us
+    </a>
 </div>
 
 </div> <!-- wrapper -->
 <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
 <script type="text/javascript" src="/js/jquery.countdown.js"></script>
 <script type="text/javascript" src="/js/main.js"></script>
+<script type="text/javascript" src="/js/column.js"></script>
 <script type="text/javascript">
 jQuery(function() {
     {% if is_registered %}
-        // Show countdown to game start
-        var ts = new Date(2012, 7, 1, 10, 30).getTime();
-        var event = "the games begin!";
+        {% if game_started %}
+            // Show countdown to game end
+            var ts = new Date(2012, 8, 31, 24, 0).getTime();
+            var event = "the game ends!";
+        {% else %}
+            // Show countdown to game start
+            var ts = new Date(2012, 7, 2, 11, 0).getTime();
+            var event = "the games begin!";
+        {% endif %}
     {% else %}
         // Show countdown to registration end
-        var ts = new Date(2012, 6, 31, 20, 00).getTime();
+        var ts = new Date(2012, 7, 2, 0, 0).getTime();
         var event = "registration ends!";
     {% endif %}
 
@@ -105,16 +217,37 @@ jQuery(function() {
             $('#note').html(message);
         }
     });
-    
+
+    // Killform JS Handlers
     var killform = $('#killform');
     if (killform.length) {
-      killform.submit(function() {
-        $.post(killform.attr('action'), killform.serialize(), function(data) {
-          alert(data);
+        killform.submit(function() {
+            var killcode = killform.children('#killcode').val();
+            var playercode = "{{ player_code }}"
+            if (killcode.toLowerCase() == playercode.toLowerCase()) {
+                if (confirm('Are you sure you want to commit suicide?')) {
+                    $.post(killform.attr('action'), killform.serialize(), function(data) {
+                        if (data == "true") {
+                            alert("You've committed suicide!");
+                            document.location.reload(true);
+                        } else {
+                            alert(data);
+                        }
+                    });
+                }
+            } else {
+                $.post(killform.attr('action'), killform.serialize(), function(data) {
+                    if (data == "Invalid Code.") {
+                        alert(data);
+                    } else {
+                        alert(data);
+                        document.location.reload(true);
+                    }
+                });
+            }
+            killform.children('#killcode').val('');
+            return false;
         });
-        killform.children('#killcode').val('');
-        return false;
-      });
     }
     $('#killcode').focus();
 });

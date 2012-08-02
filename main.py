@@ -17,7 +17,6 @@ application = webapp.WSGIApplication([
   ('/admin/create', CreateGame),
   ('/admin/start', StartGame),
   ('/admin/end', EndGame),
-  ('/x', X),
 ], debug=True)
 
 def main():
