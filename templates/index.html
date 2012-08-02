@@ -54,8 +54,10 @@
     {% endif %}
 {% else %}
     {% if not is_registered %}
-    Sorry! Registration has ended and the game is underway!<br /><br />
-    Check back soon for game results!
+    <div id="status">
+        Sorry! Registration has ended and the game is underway!<br /><br />
+        Check back soon for game results!
+    </div>
     {% endif %}
 {% endif %}
 

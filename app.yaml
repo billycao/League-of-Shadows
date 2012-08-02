@@ -9,6 +9,8 @@ env_variables:
   show_game_title: false
   # Maximum number of players per game
   max_players: 200
+  # Send email to players upon start
+  email_when_start: true
 
 handlers:
 - url: /favicon\.ico
