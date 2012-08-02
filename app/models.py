@@ -95,6 +95,6 @@ class Player(db.Model):
     return killcode.upper()
 
 
-def game_key(game_name=None):
+def game_key(game_name):
   """Constructs a Datastore key for a Mission entity given an assassin."""
-  return db.Key.from_path("Game", game_name or 'MTV')
+  return db.Key.from_path("Game", game_name)

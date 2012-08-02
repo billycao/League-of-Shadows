@@ -9,6 +9,87 @@ from google.appengine.api import users, mail
 from google.appengine.ext import webapp
 from models import *
 
+class Renderer(webapp.RequestHandler):
+  def get_mission(self, assassin, victim, status=None, timestamp=None):
+    mission = Mission()
+    mission.assassin = assassin
+    mission.victim = victim
+    mission.status = status
+    mission.timestamp = timestamp
+    return mission
+
+  def get(self):
+    game_name = 'TEST'
+    player_name = users.get_current_user().nickname()
+
+    # Game statistics
+    stats_list = []
+    stats_list.append(('Total Players', 5))
+    stats_list.append(('Players Dead', 3))
+    stats_list.append(('Your Kills', 2))
+
+    # Typical URL combination
+    # admin/render?registered=false&started=false
+    # admin/render?registered=false&started=true
+    # admin/render?registered=true&started=false
+    # admin/render?registered=true&started=true
+    # admin/render?registered=true&started=true&player=killed
+    # admin/render?registered=true&started=true&player=suicide
+    # admin/render?registered=true&started=true&over=true
+
+    is_registered = self.request.get('registered') or self.request.get('is_registered')
+    game_started = self.request.get('started') or self.request.get('game_started')
+    is_suicide = False
+    death_mission = None
+    target_mission = None
+    winner = None
+    player_code = 'CODE'
+
+    if self.request.get('over'):
+      winner = self.get_mission('winner', 'winner', 9001)
+
+    if self.request.get('player') == 'killed':
+      death_mission = self.get_mission('assassin', player_name)
+    elif self.request.get('player') == 'suicide':
+      is_suicide = True
+    else:
+      target_mission = self.get_mission(player_name, 'victim')
+
+    if users.get_current_user():
+      url = users.create_logout_url(self.request.uri)
+      url_linktext = 'Logout'
+    else:
+      url = users.create_login_url(self.request.uri)
+      url_linktext = 'Login'
+
+    template_values = {
+      'csrf_token': 'XXX',
+      'game_name': game_name,
+      'game_started': game_started,
+      'games': None,
+      'is_registered': is_registered,
+      'is_suicide': is_suicide,
+      'killcode_quips': [
+          "Remember it, and surrender it upon death.",
+          "Hover to view. Keep it hidden. Keep it safe."
+      ],
+      'num_players': 5,
+      'target_mission': target_mission,
+      'death_mission': death_mission,
+      'stats_list': stats_list,
+      'stats_list_width': len(stats_list) * 120,
+      'url': url,
+      'url_linktext': url_linktext,
+      'player_name': player_name,
+      'player_code': player_code,
+      'winner': winner,
+      'FLAGS_show_game_title': os.environ['show_game_title'] == "True",
+      'FLAGS_max_players': int(os.environ['max_players'])
+    }
+
+    path = os.path.join(os.path.dirname(__file__)+ '/../templates/', 'index.html')
+    self.response.out.write(template.render(path, template_values))
+
 class CreateGame(webapp.RequestHandler):
   def get(self):
     game_name = self.request.get('game_name')

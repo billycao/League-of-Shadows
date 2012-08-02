@@ -1,0 +1,19 @@
+﻿<form action="/join" method="post">
+    <fieldset>
+        <strong>Registration has been extended to 11am!</strong><br />
+        <br />
+        Are you an intern? What are you waiting for? <br />
+        Join the other <b>{{ num_players }}</b> assassin{{ num_players|pluralize }}!<br />
+        {# TODO(billycao): Make this system work for multiple games. #}
+        <input type="hidden" name="game_name" value="{{ game_name }}"/>
+        <!--
+        <select name="game_name" hidden>
+            {% for game in games %}
+                <option>{{ game.key.name }}</option>
+            {% endfor %}
+        </select>
+        -->
+        <input class="big_button" type="submit" value="Join the fray!"><br />
+        <small>Your username <b>{{ player_name }}</b> will be recorded.</small>
+    </fieldset>
+</form>
