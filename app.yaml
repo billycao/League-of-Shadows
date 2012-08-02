@@ -4,6 +4,9 @@ runtime: python
 api_version: 1
 threadsafe: yes
 
+inbound_services:
+- mail
+
 env_variables:
   # If true, show the title of the current game on the UI
   show_game_title: false
@@ -23,6 +26,10 @@ handlers:
   static_dir: assets/js
 - url: /stylesheets
   static_dir: assets/stylesheets
+
+- url: /_ah/mail/.+
+  script: app/emails.py
+  login: admin
 
 - url: /admin/.*
   script: main.py
