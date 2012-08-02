@@ -37,7 +37,7 @@
                 Are you an intern? What are you waiting for? <br />
                 Join the other <b>{{ num_players }}</b> assassin{{ num_players|pluralize }}!<br />
                 {# TODO(billycao): Make this system work for multiple games. #}
-                <input name="game_name" value="{{ game_name }}" hidden/>
+                <input type="hidden" name="game_name" value="{{ game_name }}"/>
                 <!--
                 <select name="game_name" hidden>
                     {% for game in games %}
@@ -81,8 +81,10 @@
                 <hr />
                 Your target is <strong>{{ target_mission.victim|default:"unassigned" }}</strong>.
                 <form id="killform" action="/kill" method="post">
+                    <span id="killerror"></span>
                     <input type="text" id="killcode" name="killcode" />
                     <label for="killcode">Press 'Enter' to submit your kill code.</label>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
                 </form>
                 <hr />
                 Your kill code is:<br />
@@ -222,30 +224,22 @@ jQuery(function() {
     var killform = $('#killform');
     if (killform.length) {
         killform.submit(function() {
+            $('#killerror').text('');
             var killcode = killform.children('#killcode').val();
             var playercode = "{{ player_code }}"
-            if (killcode.toLowerCase() == playercode.toLowerCase()) {
-                if (confirm('Are you sure you want to commit suicide?')) {
-                    $.post(killform.attr('action'), killform.serialize(), function(data) {
-                        if (data == "true") {
-                            alert("You've committed suicide!");
-                            document.location.reload(true);
-                        } else {
-                            alert(data);
-                        }
-                    });
-                }
-            } else {
-                $.post(killform.attr('action'), killform.serialize(), function(data) {
-                    if (data == "Invalid Code.") {
-                        alert(data);
-                    } else {
-                        alert(data);
-                        document.location.reload(true);
-                    }
-                });
+            if (killcode.toLowerCase() == playercode.toLowerCase() &&
+                !confirm('Are you sure you want to commit suicide?')) {
+                return false;
             }
-            killform.children('#killcode').val('');
+            $.post(killform.attr('action'), killform.serialize(), function(data) {
+                if (data.status == "success") {
+                    alert(data.message);
+                    document.location.reload(true);
+                } else {
+                    $('#killerror').text(data.message);
+                    killform.children('#killcode').val('');
+                }
+            }, 'json');
             return false;
         });
     }
