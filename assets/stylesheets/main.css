@@ -299,3 +299,7 @@ input.big_button:active {
 #killerror {
     color: #FF7777;
 }
+
+#killsuccess  {
+    color: #55DD55;
+}

@@ -70,9 +70,9 @@
     {% else %}{# not started #}
         <h3>Welcome to the League!</h3>
         <hr />
-        {% include "killcode.html" %}
-        <hr />
         Please review the rules below, pick up your weapon from <b>MTV-43-132</b>, and wait for your first target!
+        <hr />
+        {% include "killcode.html" %}
         <hr />
         <small>{{ num_players|add:-1 }} other interns have joined.</small>
     {% endif %}
@@ -191,6 +191,7 @@ jQuery(function() {
     var killform = $('#killform');
     if (killform.length) {
         killform.submit(function() {
+            $('#killsuccess').text('');
             $('#killerror').text('');
             var killcode = killform.children('#killcode').val();
             var playercode = "{{ player_code }}"
@@ -200,8 +201,11 @@ jQuery(function() {
             }
             $.post(killform.attr('action'), killform.serialize(), function(data) {
                 if (data.status == "success") {
-                    alert(data.message);
-                    document.location.reload(true);
+                    $('#killsuccess').text(data.message);
+                    setTimeout('document.location.reload(true)', 1000);
+                } else if (data.status == "suicide") {
+                    $('#killerror').text(data.message);
+                    setTimeout('document.location.reload(true)', 1000);
                 } else {
                     $('#killerror').text(data.message);
                     killform.children('#killcode').val('');

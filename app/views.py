@@ -143,7 +143,7 @@ class Kill(webapp.RequestHandler):
         try:
           player.die(player_name)
           self.response.out.write(json.dumps({
-            'status': 'success',
+            'status': 'suicide',
             'message': "You've commited suicide!"
           }))
         except AssassinationException, e:
@@ -156,7 +156,7 @@ class Kill(webapp.RequestHandler):
           victim.die(player_name)
           self.response.out.write(json.dumps({
             'status': 'success',
-            'message': "Congratulations! You've killed %s!" % victim.nickname
+            'message': "You've killed %s!" % victim.nickname
           }))
         except AssassinationException, e:
           self.response.out.write(json.dumps({
