@@ -2,8 +2,11 @@
 
 import sys, os
 import urllib
-import json
 
+try:
+    import json
+except ImportError:
+    import simplejson as json
 from google.appengine.api import urlfetch
 from google.appengine.ext.webapp import template
 from google.appengine.api import users
@@ -124,7 +127,6 @@ class Kill(webapp.RequestHandler):
   def post(self):
     game_name = self.request.get('game_name')
     code = self.request.get('killcode').lower()
-    ksuccesstext = "true"
 
     if users.get_current_user():
       player_name = users.get_current_user().nickname()
