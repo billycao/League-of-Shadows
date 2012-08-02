@@ -49,7 +49,8 @@
         {% else %}{% if target_mission %}
             <h3>The games have begun!</h3>
             <hr />
-            Your target is <strong>{{ target_mission.victim|default:"unassigned" }}</strong>.
+            Your target is <strong>{{ target_mission.victim|default:"unassigned" }}</strong>.<br />
+            <small>Clip them and obtain their kill code!</small>
             {% include 'killform.html' %}
             <hr />
             {% include 'killcode.html' %}
