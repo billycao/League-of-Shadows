@@ -76,6 +76,10 @@ class MainPage(webapp.RequestHandler):
       'games': games,
       'is_registered': is_registered,
       'is_suicide': is_suicide,
+      'killcode_quips': [
+          "Remember it, and surrender it upon death.",
+          "Hover to view. Keep it hidden. Keep it safe."
+      ],
       'num_players': num_players,
       'target_mission': target_mission,
       'death_mission': death_mission,

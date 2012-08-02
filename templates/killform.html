@@ -1,0 +1,6 @@
+﻿<form id="killform" action="/kill" method="post">
+    <span id="killerror"></span>
+    <input type="text" id="killcode" name="killcode" />
+    <label for="killcode">Press 'Enter' to submit your kill code.</label>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
+</form>

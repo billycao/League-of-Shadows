@@ -6,7 +6,7 @@
 <link type="text/css" rel="stylesheet" href="/stylesheets/jquery.countdown.css" />
 </head>
 <body onload="selectColumn('rules')">
-
+{% spaceless %}
 <div id="wrapper">
 
 <div id="header">
@@ -25,109 +25,71 @@
         <div id="countdown"></div>
         <p id="note" class="note"></p>
     </div>
+{% endif %}
 
-    {% if not is_registered %}
-    <div id="register_wrapper">
-        {% if num_players >= FLAGS_max_players %}
-            Sorry, but the maximum player count of {{ FLAGS_max_players }} has been reached.<br /><br />
-            Please check back soon, as there is a good chance we will raise this cap.
-        {% else %}
-        <form action="/join" method="post">
-            <fieldset>
-                Are you an intern? What are you waiting for? <br />
-                Join the other <b>{{ num_players }}</b> assassin{{ num_players|pluralize }}!<br />
-                {# TODO(billycao): Make this system work for multiple games. #}
-                <input type="hidden" name="game_name" value="{{ game_name }}"/>
-                <!--
-                <select name="game_name" hidden>
-                    {% for game in games %}
-                        <option>{{ game.key.name }}</option>
-                    {% endfor %}
-                </select>
-                -->
-                <input class="big_button" type="submit" value="Join the fray!"><br />
-                <small>Your username <b>{{ player_name }}</b> will be recorded.</small>
-            </fieldset>
-        </form>
-        {% endif %}
+{% if game_started and is_registered %}
+    <div id="stats_wrapper" class="container" style="width: {{ stats_list_width }}px">
+        {% for statname, statnum in stats_list %}
+            <div class="stat">
+                <p class="statnum">{{ statnum }}</p>
+                <p class="statname">{{ statname }}</p>
+            </div>
+        {% endfor %}
+        <div>More stats and UI soon!</div>
     </div>
-    {% endif %}
-{% else %}
-    {% if not is_registered %}
-    <div id="status">
-        Sorry! Registration has ended and the game is underway!<br /><br />
-	However, we're working on a system to let players join the game as <strong>Terminators</strong>.<br /><br />
-        Check back soon!
-    </div>
-    {% endif %}
 {% endif %}
 
 {% if is_registered %}
-    {% if game_started %}
-        <div id="stats_wrapper" class="container" style="width: {{ stats_list_width }}px">
-            {% for statname, statnum in stats_list %}
-                <div class="stat">
-                    <p class="statnum">{{ statnum }}</p>
-                    <p class="statname">{{ statname }}</p>
-                </div>
-            {% endfor %}
-            <div>More stats and UI soon!</div>
-        </div>
-    {% endif %}
     <div id="status">
     {% if game_started %}
         {% if winner %}
             <strong>{{ winner.assassin }} is the last assassin standing!</strong><br /><br />
             Stay tuned as we announce the winners, top players, and stats!
+
+        {% else %}{% if target_mission %}
+            <h3>The games have begun!</h3>
+            <hr />
+            Your target is <strong>{{ target_mission.victim|default:"unassigned" }}</strong>.
+            {% include 'killform.html' %}
+            <hr />
+            {% include 'killcode.html' %}
+
         {% else %}
-            {% if target_mission %}
-                <h3>The games have begun!</h3>
-                <hr />
-                Your target is <strong>{{ target_mission.victim|default:"unassigned" }}</strong>.
-                <form id="killform" action="/kill" method="post">
-                    <span id="killerror"></span>
-                    <input type="text" id="killcode" name="killcode" />
-                    <label for="killcode">Press 'Enter' to submit your kill code.</label>
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}"/>
-                </form>
-                <hr />
-                Your kill code is:<br />
-                <div class="hidden_hover">
-                    {{ player_code }}
-                </div>
-                <small>Remember it, and surrender it upon death.</small>
+            Oh no! You've died! :(<br />
+            {% if is_suicide %}
+                <small>It appears you've committed suicide!</small>
             {% else %}
-                Oh no! You've died! :(<br />
-                {% if is_suicide %}
-                    <small>It appears you've committed suicide!</small>
-                {% else %}
-                    <small>{{ death_mission.assassin }} has eliminated you!</small>
-                {% endif %}
-                <hr />
-                <h3>Terminator System</h3>
-                <small>Coming soon!</small>
-                <!--
-                <form id="killform" action="/kill" method="post">
-                    <input type="text" id="killcode" name="killcode" />
-                    <label for="killcode">Press 'Enter' to submit your kill code.</label>
-                </form>
-                -->
-                <hr />
-                <small>Think you died in error? Contact us below!</small>
+                <small>{{ death_mission.assassin }} has eliminated you!</small>
             {% endif %}
-        {% endif %}
-    {% else %}
+            <hr />
+            <h3>Terminator System</h3>
+            <small>Coming soon!</small>
+            <hr />
+            <small>Think you died in error? Contact us below!</small>
+        {% endif %}{% endif %}
+    {% else %}{# not started #}
         <h3>Welcome to the League!</h3>
         <hr />
-        Your kill code is
-        <div class="hidden_hover">
-            {{ player_code }}
-        </div>
-        <small>Hover to view. Keep it hidden. Keep it safe.</small>
+        {% include "killcode.html" %}
         <hr />
         Please review the rules below, pick up your weapon from <b>MTV-43-132</b>, and wait for your first target!
         <hr />
         <small>{{ num_players|add:-1 }} other interns have joined.</small>
+    {% endif %}
+    </div>
+{% else %}{# not registered #}
+    <div id="register_wrapper">
+    {% if game_started %}
+        Sorry! Registration has ended and the game is underway!<br /><br />
+        However, we're working on a system to let players join the game as <strong>Terminators</strong>.<br /><br />
+        Check back soon!
+    {% else %}{# not started #}
+        {% if num_players >= FLAGS_max_players %}
+            Sorry, but the maximum player count of {{ FLAGS_max_players }} has been reached.<br /><br />
+            Please check back soon, as there is a good chance we will raise this cap.
+        {% else %}
+            {% include 'registerform.html' %}
+        {% endif %}
     {% endif %}
     </div>
 {% endif %}
@@ -189,6 +151,7 @@
 </div>
 
 </div> <!-- wrapper -->
+{% endspaceless %}
 <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
 <script type="text/javascript" src="/js/jquery.countdown.js"></script>
 <script type="text/javascript" src="/js/main.js"></script>
