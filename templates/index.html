@@ -34,6 +34,7 @@
         {% else %}
         <form action="/join" method="post">
             <fieldset>
+                <b>Registration has been extended until 11am</b><br /><br />
                 Are you an intern? What are you waiting for? <br />
                 Join the other <b>{{ num_players }}</b> assassin{{ num_players|pluralize }}!<br />
                 {# TODO(billycao): Make this system work for multiple games. #}
@@ -205,7 +206,7 @@ jQuery(function() {
         {% endif %}
     {% else %}
         // Show countdown to registration end
-        var ts = new Date(2012, 7, 2, 0, 0).getTime();
+        var ts = new Date(2012, 7, 2, 11, 0).getTime();
         var event = "registration ends!";
     {% endif %}
 
