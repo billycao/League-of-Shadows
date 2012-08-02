@@ -1,5 +1,5 @@
 ﻿application: google.com:leagueofinterns
-version: 2
+version: 1
 runtime: python
 api_version: 1
 threadsafe: yes
