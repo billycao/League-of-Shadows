@@ -22,6 +22,7 @@ class Mission(db.Model):
   FAILURE = -1
   INVALIDATED = 0
   SUICIDE = -2
+  WIN = 9001
 
   ASSASSINATION_ACTIONS = [
     "assassinated", "air-conditioned", "annihilated", "barbequed", "bashed", "beat down", 
@@ -89,11 +90,11 @@ class Player(db.Model):
       raise AssassinationException("%s already dead." % self.nickname)
         
     if killer == self.nickname:
-      assassination.status = 0
-      mission.status = -1
+      assassination.status = Mission.INVALIDATED
+      mission.status = Mission.SUICIDE
     elif killer == assassination.assassin:
-      assassination.status = 1
-      mission.status = -1
+      assassination.status = Mission.SUCCESS
+      mission.status = Mission.FAILED
     else:
       raise AssassinationException("%s cannot kill %s." % (killer, self.nickname))
     assassination.timestamp = datetime.now()
@@ -105,7 +106,7 @@ class Player(db.Model):
     newmission.assassin = assassination.assassin
     newmission.victim = mission.victim
     if newmission.assassin == newmission.victim:
-      newmission.status = 9001
+      newmission.status = Mission.WIN
     newmission.put()
     
   def kill(self, victim):
@@ -113,6 +114,18 @@ class Player(db.Model):
 
   def commit_suicide(self):
     pass
+
+  def get_missions(self):
+    return Mission.all().ancestor(self.parent_key()).filter(
+        "assassin = ", self.nickname).order("-timestamp")
+
+  def current_mission(self):
+    return Mission.all().ancestor(self.parent_key()).filter(
+        "assassin = ", self.nickname).filter("timestamp =", None).get()
+
+  def last_assassination_attempt(self):
+    return Mission.all().ancestor(self.parent_key()).order("-timestamp") \
+        .filter("victim = ", self.nickname).get()
 
   @staticmethod
   def in_game(game_name):

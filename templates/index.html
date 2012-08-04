@@ -57,13 +57,11 @@
 
         {% else %}
             Oh no! You've died! :(<br />
-            {% comment %}
-            {% if is_suicide %}
-                <small>It appears you've committed suicide!</small>
+            {% if assassination.status == 1 %}
+                <small>{{ assassination.assassin }} has eliminated you!</small>
             {% else %}
-                <small>{{ death_mission.assassin }} has eliminated you!</small>
+                <small>It appears you've committed suicide!</small>
             {% endif %}
-            {% endcomment %}
             <hr />
             <h3>Terminator System</h3>
             <small>Coming soon!</small>
@@ -197,7 +195,7 @@ jQuery(function() {
             $('#killsuccess').text('');
             $('#killerror').text('');
             var killcode = killform.children('#killcode').val();
-            var playercode = "{{ player_code }}"
+            var playercode = "{{ player.code }}"
             if (killcode.toLowerCase() == playercode.toLowerCase() &&
                 !confirm('Are you sure you want to commit suicide?')) {
                 return false;

@@ -43,3 +43,18 @@
   properties:
   - name: timestamp
     direction: desc
+
+- kind: Mission
+  ancestor: yes
+  properties:
+  - name: victim
+  - name: status
+  - name: timestamp
+    direction: desc
+
+- kind: Mission
+  ancestor: yes
+  properties:
+  - name: victim
+  - name: timestamp
+    direction: desc
