@@ -1,5 +1,4 @@
-﻿#!/usr/bin/env python
-
+﻿
 import uuid
 from google.appengine.ext import db
 from datetime import datetime

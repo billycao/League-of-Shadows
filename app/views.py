@@ -1,5 +1,4 @@
-﻿#!/usr/bin/env python
-
+﻿
 from datetime import timedelta
 import sys, os
 import urllib

@@ -1,5 +1,4 @@
-﻿#!/usr/bin/env python
-
+﻿
 import os
 from random import shuffle
 
