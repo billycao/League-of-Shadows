@@ -57,11 +57,13 @@
 
         {% else %}
             Oh no! You've died! :(<br />
+            {% comment %}
             {% if is_suicide %}
                 <small>It appears you've committed suicide!</small>
             {% else %}
                 <small>{{ death_mission.assassin }} has eliminated you!</small>
             {% endif %}
+            {% endcomment %}
             <hr />
             <h3>Terminator System</h3>
             <small>Coming soon!</small>

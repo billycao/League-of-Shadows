@@ -9,6 +9,7 @@ from google.appengine.api import users, mail
 from google.appengine.ext import webapp
 from models import *
 
+
 class Renderer(webapp.RequestHandler):
   def get_mission(self, assassin, victim, status=None, timestamp=None):
     mission = Mission()
@@ -90,22 +91,25 @@ class Renderer(webapp.RequestHandler):
     path = os.path.join(os.path.dirname(__file__)+ '/../templates/', 'index.html')
     self.response.out.write(template.render(path, template_values))
 
+
 class CreateGame(webapp.RequestHandler):
   def get(self):
     game_name = self.request.get('game_name')
-    if db.get(game_key(game_name or 'default_game')):
+    if db.get(Game.get_key(game_name or 'default_game')):
       self.response.out.write("Exists")
       return
     game = Game(key_name=game_name or 'default_game')
     game.put()
     self.response.out.write("Created")
-	
+
+
 class EndGame(webapp.RequestHandler):
   def get(self):
     game_name = self.request.get('game_name')
     missions = Mission.in_game(game_name).fetch(None)
     db.delete(missions)
     self.response.out.write("Done")
+
 
 class StartGame(webapp.RequestHandler):
   def get(self):
@@ -119,7 +123,7 @@ class StartGame(webapp.RequestHandler):
 
     assassin = users[len(users) - 1]
     for user in users:
-      mission = Mission(parent=game_key(game_name))
+      mission = Mission(parent=Game.get_key(game_name))
       mission.assassin = assassin.nickname
       mission.victim = user.nickname
       mission.put()

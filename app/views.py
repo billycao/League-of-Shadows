@@ -1,5 +1,6 @@
 ﻿#!/usr/bin/env python
 
+from datetime import timedelta
 import sys, os
 import urllib
 
@@ -62,8 +63,8 @@ class MainPage(webapp.RequestHandler):
           death_mission = Mission.in_game(game_name).filter(
             'victim =', player_name).get()
           is_suicide = Mission.in_game(game_name)\
-                              .filter('assassin =', player_name)\
-                              .get().status == -1
+                              .filter('victim =', player_name)\
+                              .get().status == 1
 
     if users.get_current_user():
       url = users.create_logout_url(self.request.uri)
@@ -111,7 +112,7 @@ class JoinGame(webapp.RequestHandler):
       exists = Player.in_game(game_name).filter(
           'nickname =', users.get_current_user().nickname()).count()
       if not exists:
-        player = Player(parent=game_key(game_name),
+        player = Player(parent=Game.get_key(game_name),
             key_name=users.get_current_user().nickname())
         player.code = Player.newcode()
         player.nickname = users.get_current_user().nickname()
@@ -122,6 +123,7 @@ class JoinGame(webapp.RequestHandler):
     else:
       url = users.create_login_url(self.request.uri)
       self.response.out.write("<a href=\"%s\">Login</a>" % url)
+
 
 class Kill(webapp.RequestHandler):
   def post(self):
@@ -143,6 +145,7 @@ class Kill(webapp.RequestHandler):
       
       if player.code.lower() == code:
         try:
+          player.commit_suicide()
           player.die(player_name)
           self.response.out.write(json.dumps({
             'status': 'suicide',
@@ -155,6 +158,7 @@ class Kill(webapp.RequestHandler):
           }))
       elif victim.code.lower() == code:
         try:
+          player.kill(mission.victim)
           victim.die(player_name)
           self.response.out.write(json.dumps({
             'status': 'success',

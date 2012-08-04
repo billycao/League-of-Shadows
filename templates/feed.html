@@ -1,0 +1,13 @@
+﻿<div id="events" style="display: block">
+<h3>Feed</h3>
+<ul>
+{% for event in events %}
+    {% if event.event == 101 %}
+        <li><strong>{{ event.subject }}</strong> {{ event.action }} <strong>{{ event.victim }}</strong>!!
+    {% else %}
+        <li><strong>{{ event.subject }}</strong> {{ event.action }}!!
+    {% endif %}
+    <span class="timestamp">{{ event.timestamp }}</span></li>
+{% endfor %}
+</ul>
+</div>
