@@ -3,6 +3,7 @@ import uuid
 from google.appengine.ext import db
 from datetime import datetime
 from random import choice
+from operator import itemgetter
 
 class AssassinationException(Exception):
   def __init__(self, value):
@@ -160,6 +161,15 @@ class Player(db.Model):
   def last_assassination_attempt(self):
     return Mission.all().ancestor(self.parent_key()).order("-timestamp") \
         .filter("victim = ", self.nickname).get()
+
+  def is_alive(self):
+    return self.current_mission() != None
+
+  @staticmethod
+  def get_top_killers(number):
+    all_player_kills = [(player.nickname, player.get_kills().count(), player.is_alive()) for player in Player.all()]
+    all_player_kills.sort(key=itemgetter(1), reverse=True)
+    return all_player_kills[:number]
 
   @staticmethod
   def in_game(game_name):

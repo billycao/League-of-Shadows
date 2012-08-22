@@ -1,4 +1,4 @@
-﻿
+
 from datetime import timedelta
 import sys, os
 import urllib
@@ -26,12 +26,14 @@ class MainPage(webapp.RequestHandler):
         self.response.out.write("No game has been created yet.<br />"
                                 "The administrator must create one before the awesomeness begins.")
         return
+
     player = Player.get(game_name, player_name)
 
     # Game statistics
     stats_list = []
     num_players = Player.in_game(game_name).count()
     num_players_dead = Mission.in_game(game_name).filter('status !=', None).filter('status <', 0).count()
+    num_players_alive = num_players - num_players_dead
     num_kills = Mission.in_game(game_name)\
                        .filter('assassin =', player_name)\
                        .filter('status =', Mission.SUCCESS)\
@@ -39,10 +41,15 @@ class MainPage(webapp.RequestHandler):
     winner = Mission.in_game(game_name).filter('status =', Mission.WIN).get()
 
     stats_list.append(('Total Players', num_players))
+    stats_list.append(('Survivors', num_players_alive))
     stats_list.append(('Players Dead', num_players_dead))
     stats_list.append(('Your Kills', num_kills))
 
     publiclist = Player.in_game(game_name).filter('publiclist >', 0).fetch(None)
+
+    leaderboard = []
+    leaders = Player.get_top_killers(5)
+    leaderboard = [(name, kills, 'ACTIVE' if status else 'KILLED') for name, kills, status in leaders]
 
     if users.get_current_user():
       url = users.create_logout_url(self.request.uri)
@@ -62,11 +69,11 @@ class MainPage(webapp.RequestHandler):
           "Hover to view. Keep it hidden. Keep it safe."
       ],
       'missions': player.past_missions().fetch(None),
+      'leaderboard': leaderboard,
       'num_players': num_players,
-      'target_mission': player.current_mission(),
-      'assassination': player.last_assassination_attempt(),
       'stats_list': stats_list,
       'stats_list_width': len(stats_list) * 120,
+      'target_mission': None,
       'url': url,
       'url_linktext': url_linktext,
       'player': player,
@@ -75,6 +82,10 @@ class MainPage(webapp.RequestHandler):
       'FLAGS_show_game_title': os.environ['show_game_title'] == "True",
       'FLAGS_max_players': int(os.environ['max_players'])
     }
+
+    if player:
+      template_values['target_mission'] = player.current_mission()
+      template_values['assassination'] = player.last_assassination_attempt()
     
     path = os.path.join(os.path.dirname(__file__)+ '/../templates/', 'index.html')
     self.response.out.write(template.render(path, template_values))

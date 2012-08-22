@@ -111,6 +111,18 @@ fieldset {
     margin: 0 0 -50px;
 }
 
+#column_wrapper {
+    background: #333;
+    border-radius: 5px;
+    color: #ccc;
+    font-size: 12px;
+    display: inline-block;
+    position: relative;
+    text-align: left;
+    width: 325px;
+    margin: 15px;
+}
+
 #column_wrapper b {
     color: #990000;
 }
@@ -249,6 +261,35 @@ fieldset {
     color: inherit;
     background: none;
 }
+
+/*
+ * Leaderboard
+ */
+#leaderboard {
+    background: #333;
+    border-radius: 5px;
+    color: #ccc;
+    font-size: 12px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 20px;
+    width: 325px;
+}
+
+#leaderHeader {
+    font-size: 32px;
+}
+
+#leaderboard td {
+    padding: 3px 10px;
+}
+
+.leaderRank {
+    color: #900;
+    font-weight: bold;
+    font-size: 18px;
+}
+
 
 /*
  * Specific Elements
