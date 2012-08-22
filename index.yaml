@@ -10,9 +10,17 @@
 # automatically uploaded to the admin console when you next deploy
 # your application using appcfg.py.
 
-- kind: Event
+- kind: Mission
+  properties:
+  - name: status
+  - name: timestamp
+    direction: desc
+
+- kind: Mission
   ancestor: yes
   properties:
+  - name: assassin
+  - name: status
   - name: timestamp
     direction: desc
 
@@ -25,7 +33,27 @@
 - kind: Mission
   ancestor: yes
   properties:
+  - name: assassin
+  - name: timestamp
+    direction: desc
+
+- kind: Mission
+  ancestor: yes
+  properties:
   - name: status
+
+- kind: Mission
+  ancestor: yes
+  properties:
+  - name: status
+  - name: publiclist
+
+- kind: Mission
+  ancestor: yes
+  properties:
+  - name: status
+  - name: timestamp
+    direction: desc
 
 - kind: Mission
   ancestor: yes
@@ -58,3 +86,14 @@
   - name: victim
   - name: timestamp
     direction: desc
+
+- kind: Player
+  ancestor: yes
+  properties:
+  - name: code
+  - name: nickname
+
+- kind: Player
+  ancestor: yes
+  properties:
+  - name: publiclist

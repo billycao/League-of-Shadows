@@ -2,12 +2,14 @@
 <h3>Feed</h3>
 <ul>
 {% for event in events %}
-    {% if event.event == 101 %}
-        <li><strong>{{ event.subject }}</strong> {{ event.action }} <strong>{{ event.victim }}</strong>!!
-    {% else %}
-        <li><strong>{{ event.subject }}</strong> {{ event.action }}!!
+    {% if event.status and event.status != 0 and event.status != -1 %}
+      {% if event.status > 0 %}
+          <li><strong>{{ event.assassin }}</strong> {{ event.action }} <strong>{{ event.victim }}</strong>!!
+      {% else %}{% if event.status == -2 %}
+          <li><strong>{{ event.assassin }}</strong> {{ event.action }}!!
+      {% endif %}{% endif %}
+      <span class="timestamp">{{ event.timestamp }}</span></li>
     {% endif %}
-    <span class="timestamp">{{ event.timestamp }}</span></li>
 {% endfor %}
 </ul>
 </div>

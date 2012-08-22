@@ -1,1 +1,5 @@
 ﻿cron:
+- description: Public kill list
+  url: /admin/genkilllist
+  schedule: every day 00:00
+  target: version-2

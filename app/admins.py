@@ -1,6 +1,7 @@
 ﻿
 import os
-from random import shuffle
+import math
+from random import shuffle, sample
 
 from google.appengine.api import urlfetch
 from google.appengine.ext.webapp import template
@@ -165,3 +166,22 @@ Don't worry, we won't spam you. Future email notifications will be opt-out.<br /
         mail.send_mail(sender_address, user.email, subject, body, html=html)
     self.response.out.write("Done")
     
+
+class GenKillList(webapp.RequestHandler):
+  def get(self):
+    game_name = self.request.get('game_name')
+    alive = Mission.in_game(game_name).filter('status =', None).fetch(None)
+    alivenames = [ p.assassin for p in alive ]
+    update = []
+    for name in alivenames:
+      player = Player.get(game_name, name)
+      if player.publiclist == 0 or player.publiclist == 1:
+        player.publiclist = 0
+        update.append(player)
+
+    for player in sample(update, min(10, len(update))):
+      player.publiclist = 1
+
+    for p in update:
+      self.response.out.write('%s %d<br />' % (p.nickname, p.publiclist))
+    db.put(update)

@@ -96,8 +96,40 @@
 {% endif %}
 
 <div id="column_wrapper">
-    <div onclick="selectColumn('rules')"><div class="column_title"><h3><b>&raquo;</b> Rules</h3></div></div>
-    <div id="rules" class="column">
+{% comment %}
+<div id="left_column" class="column">
+    <div><div class="section_title"><h3><b>&raquo;</b> Mission Log</h3></div></div>
+    <div id="missions" class="section">
+    <ul>
+        <li>
+            Current target: {{ mission.victim }}
+            {% if mission.status == 0 %}
+              <span class="invalidated">INVALIDATED</span>
+            {% else %}{% if mission.status > 0 %}
+              <span class="green">SUCCESS</span>
+            {% else %}
+              <span class="red">FAILED</span>
+            {% endif %}{% endif %}
+        </li>
+    {% for mission in missions %}
+        <li>
+            Target: {{ mission.victim }}
+            {% if not mission.status %}
+              <span class="green">IN PROGRESS</span>
+            {% else %}{% if mission.status > 0 %}
+              <span class="green">SUCCESS</span>
+            {% else %}
+              <span class="red">FAILED</span>
+            {% endif %}{% endif %}
+        </li>
+    {% endfor %}
+    </ul>
+    </div>
+</div>
+{% endcomment %}
+<div id="right_column" class="column">
+    <div class="expandable" onclick="selectColumn('rules')"><div class="section_title"><h3><b>&raquo;</b> Rules</h3></div></div>
+    <div id="rules" class="section">
         <i>How to play:</i>
         <p>&nbsp;&nbsp;Assassins is a game of cleverness and stealth. You will be given a target, and your job is to eliminate that target by
         clipping a clothespin onto their clothes. They will give you a kill code that you must enter into this site once they are killed.
@@ -114,9 +146,10 @@
 
         If you are found breaking any of these rules, you may be disqualified.
     </div>
-    <div onclick="selectColumn('faq')"><div class="column_title"><h3><b>&raquo;</b> FAQ</h3></div></div>
-    <div id="faq" class="column">
-        <b>Q: </b><i>How do I eliminate my target?</i><br />
+    <div class="expandable" onclick="selectColumn('faq')"><div class="section_title"><h3><b>&raquo;</b> FAQ</h3></div></div>
+    <div id="faq" class="section">
+        <p>
+            <b>Q: </b><i>How do I eliminate my target?</i><br />
             <b>A: </b>Just clip them with your clothespin! However, be careful not to actually harm your victim, not to disrupt others, and review the rules.<br /><br />
             When you get clipped, surrender your <strong>kill code</strong> so your death can be recorded.
         </p>
@@ -142,6 +175,7 @@
             <b>A: </b>The game still isn't over! We're working on a <strong>Terminator</strong> system that will list idle assassins (those that haven't killed anyone in 3 days) to be killed by <em>anyone</em>.
         </p>
     </div>
+</div>
 </div>
 
 <div id="footer">

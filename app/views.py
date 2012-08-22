@@ -42,6 +42,8 @@ class MainPage(webapp.RequestHandler):
     stats_list.append(('Players Dead', num_players_dead))
     stats_list.append(('Your Kills', num_kills))
 
+    publiclist = Player.in_game(game_name).filter('publiclist >', 0).fetch(None)
+
     if users.get_current_user():
       url = users.create_logout_url(self.request.uri)
       url_linktext = 'Logout'
@@ -59,6 +61,7 @@ class MainPage(webapp.RequestHandler):
           "Remember it, and surrender it upon death.",
           "Hover to view. Keep it hidden. Keep it safe."
       ],
+      'missions': player.past_missions().fetch(None),
       'num_players': num_players,
       'target_mission': player.current_mission(),
       'assassination': player.last_assassination_attempt(),
@@ -67,6 +70,7 @@ class MainPage(webapp.RequestHandler):
       'url': url,
       'url_linktext': url_linktext,
       'player': player,
+      'publiclist': publiclist,
       'winner': winner,
       'FLAGS_show_game_title': os.environ['show_game_title'] == "True",
       'FLAGS_max_players': int(os.environ['max_players'])
@@ -76,6 +80,29 @@ class MainPage(webapp.RequestHandler):
     self.response.out.write(template.render(path, template_values))
 
     
+class KillList(webapp.RequestHandler):
+  def get(self):
+    game_name = self.request.get('game_name')
+    publiclist = Player.in_game(game_name).filter('publiclist >', 0).fetch(None)
+    template_values = {
+      'publiclist': publiclist
+    }
+    path = os.path.join(os.path.dirname(__file__)+ '/../templates/', 'killlist.html')
+    self.response.out.write(template.render(path, template_values))
+
+
+class DeathList(webapp.RequestHandler):
+  def get(self):
+    game_name = self.request.get('game_name')
+    events = Mission.in_game(game_name).order('-timestamp').fetch(None)
+
+    template_values = {
+      'events': events
+    }
+    path = os.path.join(os.path.dirname(__file__)+ '/../templates/', 'feed.html')
+    self.response.out.write(template.render(path, template_values))
+
+
 class JoinGame(webapp.RequestHandler):
   def post(self):
     game_name = self.request.get('game_name')
@@ -101,8 +128,9 @@ class JoinGame(webapp.RequestHandler):
 
 class Kill(webapp.RequestHandler):
   def post(self):
+    terminator = True
     game_name = self.request.get('game_name')
-    code = self.request.get('killcode').lower()
+    code = self.request.get('killcode').upper()
 
     if users.get_current_user():
       player_name = users.get_current_user().nickname()
@@ -115,11 +143,9 @@ class Kill(webapp.RequestHandler):
       player = Player.get(game_name, player_name)
       mission = Mission.in_game(game_name).filter(
         'assassin =', player_name).filter('timestamp =', None).get()
-      victim = Player.get(game_name, mission.victim)
       
-      if player.code.lower() == code:
+      if player.code.upper() == code:
         try:
-          player.commit_suicide()
           player.die(player_name)
           self.response.out.write(json.dumps({
             'status': 'suicide',
@@ -130,9 +156,11 @@ class Kill(webapp.RequestHandler):
             'status': 'error',
             'message': "Cannot commit suicide. (%s)" % e
           }))
-      elif victim.code.lower() == code:
+      elif not terminator:
         try:
-          player.kill(mission.victim)
+          victim = Player.get(game_name, mission.victim)
+          if victim.code.upper() != code:
+            raise AssassinationException(victim.nickname)
           victim.die(player_name)
           self.response.out.write(json.dumps({
             'status': 'success',
@@ -141,7 +169,22 @@ class Kill(webapp.RequestHandler):
         except AssassinationException, e:
           self.response.out.write(json.dumps({
             'status': 'error',
-            'message': "Cannot kill target. (%s)" % e
+            'message': "Invalid code."
+          }))
+      elif terminator:
+        try:
+          victim = Player.in_game(game_name).filter("code = ", code).get()
+          if not victim:
+            raise AssassinationException("--")
+          victim.die(player_name)
+          self.response.out.write(json.dumps({
+            'status': 'success',
+            'message': "You've killed %s!" % victim.nickname
+          }))
+        except AssassinationException, e:
+          self.response.out.write(json.dumps({
+            'status': 'error',
+            'message': "Invalid code."
           }))
       else:
         self.response.out.write(json.dumps({

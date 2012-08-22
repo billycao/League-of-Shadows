@@ -18,9 +18,10 @@ class Mission(db.Model):
   timestamp = db.DateTimeProperty()
   status = db.IntegerProperty()
 
+  SUCCESSP = 2  # public kill
   SUCCESS = 1
-  FAILURE = -1
   INVALIDATED = 0
+  FAILURE = -1
   SUICIDE = -2
   WIN = 9001
 
@@ -55,6 +56,10 @@ class Mission(db.Model):
   def other_missions(self):
     return Mission.all().ancestor(self.parent_key())
 
+  def set_status(self, status):
+    self.status = status
+    self.timestamp = datetime.now()
+
   @staticmethod
   def in_game(game_name):
     return Mission.all().ancestor(Game.get_key(game_name))
@@ -77,6 +82,8 @@ class Player(db.Model):
   nickname = db.StringProperty()
   email = db.StringProperty()
   code = db.StringProperty()
+  publiclist = db.IntegerProperty(default=0)
+  publickills = db.IntegerProperty(default=0)
 
   def other_players(self):
     return Player.all().ancestor(self.parent_key())
@@ -88,36 +95,63 @@ class Player(db.Model):
         "assassin = ", self.nickname).filter("timestamp = ", None).get()
     if not assassination or not mission:
       raise AssassinationException("%s already dead." % self.nickname)
-        
-    if killer == self.nickname:
-      assassination.status = Mission.INVALIDATED
-      mission.status = Mission.SUICIDE
-    elif killer == assassination.assassin:
-      assassination.status = Mission.SUCCESS
-      mission.status = Mission.FAILED
+
+    revive = False
+    updates = []
+
+    if killer == assassination.assassin:
+      assassination.set_status(Mission.SUCCESS)
+      mission.set_status(Mission.FAILURE)
+    elif killer == self.nickname:
+      assassination.set_status(Mission.INVALIDATED)
+      mission.set_status(Mission.SUICIDE)
+    elif self.publiclist > 0:
+      assassination.set_status(Mission.INVALIDATED)
+      mission.set_status(Mission.FAILURE)
+
+      publicmission = Mission(parent=self.parent_key())
+      publicmission.assassin = killer
+      publicmission.victim = self.nickname
+      publicmission.set_status(Mission.SUCCESSP)
+      updates.append(publicmission)
+
+      publickiller = self.other_players().filter("nickname = ", killer).get()
+      if not publickiller.current_mission():  # killer is dead
+        if publickiller.publickills + 1 == 3:
+          publickiller.publickills = 0
+          revive = True
+        else:
+          publickiller.publickills += 1
+        updates.append(publickiller)
     else:
-      raise AssassinationException("%s cannot kill %s." % (killer, self.nickname))
-    assassination.timestamp = datetime.now()
-    mission.timestamp = datetime.now()
-    assassination.put()
-    mission.put()
-    
-    newmission = Mission(parent=self.parent_key())
-    newmission.assassin = assassination.assassin
-    newmission.victim = mission.victim
-    if newmission.assassin == newmission.victim:
-      newmission.status = Mission.WIN
-    newmission.put()
-    
-  def kill(self, victim):
-    pass
+      raise AssassinationException("Invalid code.")
+    updates.append(assassination)
+    updates.append(mission)
 
-  def commit_suicide(self):
-    pass
+    if revive:
+      newmission = Mission(parent=self.parent_key())
+      newmission.assassin = assassination.assassin
+      newmission.victim = killer
+      newmission2 = Mission(parent=self.parent_key())
+      newmission2.assassin = killer
+      newmission2.victim = mission.victim
+      updates.append(newmission)
+      updates.append(newmission2)
+    else:
+      newmission = Mission(parent=self.parent_key())
+      newmission.assassin = assassination.assassin
+      newmission.victim = mission.victim
+      if newmission.assassin == newmission.victim:
+        newmission.set_status(Mission.WIN)
+      updates.append(newmission)
 
-  def get_missions(self):
+    self.publiclist = -1
+    updates.append(self)
+    db.put(updates)
+
+  def past_missions(self):
     return Mission.all().ancestor(self.parent_key()).filter(
-        "assassin = ", self.nickname).order("-timestamp")
+        "assassin = ", self.nickname).filter("status !=", None).order("status").order("-timestamp")
 
   def current_mission(self):
     return Mission.all().ancestor(self.parent_key()).filter(
