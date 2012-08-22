@@ -5,7 +5,7 @@
 <link type="text/css" rel="stylesheet" href="/stylesheets/main.css" />
 <link type="text/css" rel="stylesheet" href="/stylesheets/jquery.countdown.css" />
 </head>
-<body onload="selectColumn('rules')">
+<body>
 {% spaceless %}
 <div id="wrapper">
 
@@ -35,8 +35,27 @@
                 <p class="statname">{{ statname }}</p>
             </div>
         {% endfor %}
-        <div>More stats and UI soon!</div>
     </div>
+{% endif %}
+
+{% if game_started %}
+    <table id="leaderboard" class="container">
+        <tr><h1 id="leaderHeader">TOP ASSASSINS</h1></tr>
+        <tr>
+            <th>RANK</th>
+            <th>NAME</th>
+            <th>KILLS</th>
+            <th>STATUS</th>  
+        </tr>
+        {% for name, kills, status in leaderboard %}
+            <tr class="leaderRow">
+                <td class="leaderRank">{{ forloop.counter }}</td>
+                <td>{{ name }}</td>
+                <td>{{ kills }}</td>
+                <td>{{ status }}</td>
+            </tr>
+        {% endfor %}
+    </table>
 {% endif %}
 
 {% if is_registered %}
@@ -57,10 +76,12 @@
 
         {% else %}
             Oh no! You've died! :(<br />
-            {% if assassination.status == 1 %}
-                <small>{{ assassination.assassin }} has eliminated you!</small>
-            {% else %}
-                <small>It appears you've committed suicide!</small>
+            {% if assassination %}
+                {% if assassination.status == 1 %}
+                    <small>{{ assassination.assassin }} has eliminated you!</small>
+                {% else %}
+                    <small>It appears you've committed suicide!</small>
+                {% endif %}
             {% endif %}
             <hr />
             <h3>Terminator System</h3>
