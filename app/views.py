@@ -59,6 +59,7 @@ class MainPage(webapp.RequestHandler):
       url_linktext = 'Login'
 
     template_values = {
+      'show_countdown': 1,
       'csrf_token': csrf.get_csrf_token(player_name),
       'game_name': game_name,
       'game_started': game_started,

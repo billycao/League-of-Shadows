@@ -142,8 +142,8 @@ fieldset {
     color: #ccc;
     font-size: 12px;
     text-align: left;
-    width: 400px;
-    margin: 15px;
+    width: 325px;
+    margin: 0;
     vertical-align: top;
 }
 
@@ -158,15 +158,16 @@ fieldset {
     padding: 0 5px;
     position: relative;
     text-transform: uppercase;
-    width: 400px;
+    width: 325px;
     vertical-align: middle;
     -moz-user-select: none;
 }
 
 .section {
-    height: 420px;
     overflow: auto;
     padding: 5px 15px;
+    height: 0;
+    display: none;
 }
 
 .expandable {
@@ -176,11 +177,6 @@ fieldset {
 .expandable:hover {
     background: #444;
     border-radius: 5px;
-}
-
-#right_column .section {
-    height: 0;
-    display: none;
 }
 
 #note {

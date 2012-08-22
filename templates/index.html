@@ -20,7 +20,7 @@
     <h1>Game: {{ game_name }}</h1>
 {% endif %}
 
-{% if not game_started %}
+{% if show_countdown %}
     <div id="countdown_wrapper">
         <div id="countdown"></div>
         <p id="note" class="note"></p>
@@ -117,38 +117,7 @@
 {% endif %}
 
 <div id="column_wrapper">
-{% comment %}
-<div id="left_column" class="column">
-    <div><div class="section_title"><h3><b>&raquo;</b> Mission Log</h3></div></div>
-    <div id="missions" class="section">
-    <ul>
-        <li>
-            Current target: {{ mission.victim }}
-            {% if mission.status == 0 %}
-              <span class="invalidated">INVALIDATED</span>
-            {% else %}{% if mission.status > 0 %}
-              <span class="green">SUCCESS</span>
-            {% else %}
-              <span class="red">FAILED</span>
-            {% endif %}{% endif %}
-        </li>
-    {% for mission in missions %}
-        <li>
-            Target: {{ mission.victim }}
-            {% if not mission.status %}
-              <span class="green">IN PROGRESS</span>
-            {% else %}{% if mission.status > 0 %}
-              <span class="green">SUCCESS</span>
-            {% else %}
-              <span class="red">FAILED</span>
-            {% endif %}{% endif %}
-        </li>
-    {% endfor %}
-    </ul>
-    </div>
-</div>
-{% endcomment %}
-<div id="right_column" class="column">
+<div id="main_column" class="column">
     <div class="expandable" onclick="selectColumn('rules')"><div class="section_title"><h3><b>&raquo;</b> Rules</h3></div></div>
     <div id="rules" class="section">
         <i>How to play:</i>
@@ -217,7 +186,7 @@ jQuery(function() {
     {% if is_registered %}
         {% if game_started %}
             // Show countdown to game end
-            var ts = new Date(2012, 8, 31, 24, 0).getTime();
+            var ts = new Date(2012, 7, 31, 24, 0).getTime();
             var event = "the game ends!";
         {% else %}
             // Show countdown to game start

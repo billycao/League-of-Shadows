@@ -154,6 +154,10 @@ class Player(db.Model):
     return Mission.all().ancestor(self.parent_key()).filter(
         "assassin = ", self.nickname).filter("status !=", None).order("status").order("-timestamp")
 
+  def get_kills(self):
+    return Mission.all().ancestor(self.parent_key()).filter(
+        "assassin = ", self.nickname).filter("status =", Mission.SUCCESS)
+
   def current_mission(self):
     return Mission.all().ancestor(self.parent_key()).filter(
         "assassin = ", self.nickname).filter("timestamp =", None).get()
