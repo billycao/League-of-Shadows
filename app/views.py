@@ -46,7 +46,7 @@ class MainPage(webapp.RequestHandler):
     stats_list.append(('Your Kills', num_kills))
 
     leaderboard = []
-    leaders = Player.get_top_killers(10)
+    leaders = Player.get_top_killers(5)
     leaderboard = [(name, kills, 'ACTIVE' if status else 'KILLED') for name, kills, status in leaders]
     
     if users.get_current_user():
