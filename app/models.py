@@ -18,6 +18,7 @@ class Mission(db.Model):
   victim = db.StringProperty()
   timestamp = db.DateTimeProperty()
   status = db.IntegerProperty()
+  cause_of_death = db.StringProperty()
 
   SUCCESSP = 2  # public kill
   SUCCESS = 1
@@ -85,6 +86,8 @@ class Player(db.Model):
   code = db.StringProperty()
   publiclist = db.IntegerProperty(default=0)
   publickills = db.IntegerProperty(default=0)
+  numkills = db.IntegerProperty(default=0)
+  numfailtries = db.IntegerProperty(default=0)
 
   def other_players(self):
     return Player.all().ancestor(self.parent_key())
@@ -102,10 +105,12 @@ class Player(db.Model):
 
     if killer == assassination.assassin:
       assassination.set_status(Mission.SUCCESS)
+      assassination.cause_of_death = choice(Mission.ASSASSINATION_ACTIONS)
       mission.set_status(Mission.FAILURE)
     elif killer == self.nickname:
       assassination.set_status(Mission.INVALIDATED)
       mission.set_status(Mission.SUICIDE)
+      mission.cause_of_death = choice(Mission.SUICIDE_ACTIONS)
     elif self.publiclist > 0:
       assassination.set_status(Mission.INVALIDATED)
       mission.set_status(Mission.FAILURE)
@@ -114,6 +119,7 @@ class Player(db.Model):
       publicmission.assassin = killer
       publicmission.victim = self.nickname
       publicmission.set_status(Mission.SUCCESSP)
+      publicmission.cause_of_death = choice(Mission.ASSASSINATION_ACTIONS)
       updates.append(publicmission)
 
       publickiller = self.other_players().filter("nickname = ", killer).get()
@@ -156,7 +162,7 @@ class Player(db.Model):
 
   def get_kills(self):
     return Mission.all().ancestor(self.parent_key()).filter(
-        "assassin = ", self.nickname).filter("status =", Mission.SUCCESS)
+        "assassin = ", self.nickname).filter("status >", 0).filter("status <", 100)
 
   def current_mission(self):
     return Mission.all().ancestor(self.parent_key()).filter(

@@ -19,6 +19,8 @@ application = webapp.WSGIApplication([
   ('/admin/end', EndGame),
   ('/admin/render', Renderer),
   ('/admin/genkilllist', GenKillList),
+  ('/admin/updatenumkills', UpdateNumKills),
+  ('/admin/freeattempts', FreeAttempts),
   ('/killlist', KillList),
   ('/deathlist', DeathList),
 ], debug=True)

@@ -21,6 +21,12 @@
   properties:
   - name: assassin
   - name: status
+
+- kind: Mission
+  ancestor: yes
+  properties:
+  - name: assassin
+  - name: status
   - name: timestamp
     direction: desc
 

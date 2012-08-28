@@ -105,6 +105,10 @@ class StartGame(webapp.RequestHandler):
       mission.assassin = assassin.nickname
       mission.victim = user.nickname
       mission.put()
+      user.numkills = 0
+      user.publickills =  0
+      user.publiclist = 0
+      user.put()
       assassin = user
       # Send email to all players
       if not mail.is_email_valid(user.email):
@@ -165,7 +169,18 @@ Don't worry, we won't spam you. Future email notifications will be opt-out.<br /
 """ % game_name
         mail.send_mail(sender_address, user.email, subject, body, html=html)
     self.response.out.write("Done")
-    
+
+
+class UpdateNumKills(webapp.RequestHandler):
+  def get(self):
+    game_name = self.request.get('game_name')
+    players = Player.in_game(game_name).fetch(None)
+    update = []
+    for p in players:
+      p.numkills = p.get_kills().count()
+      update.append(p)
+    db.put(update)
+
 
 class GenKillList(webapp.RequestHandler):
   def get(self):
@@ -173,15 +188,34 @@ class GenKillList(webapp.RequestHandler):
     alive = Mission.in_game(game_name).filter('status =', None).fetch(None)
     alivenames = [ p.assassin for p in alive ]
     update = []
+    candidates = []
     for name in alivenames:
       player = Player.get(game_name, name)
       if player.publiclist == 0 or player.publiclist == 1:
         player.publiclist = 0
+        if player.numkills == 0:
+          candidates.append(player)
         update.append(player)
 
-    for player in sample(update, min(10, len(update))):
-      player.publiclist = 1
+    numpubliclist = 0
+    targetnumpubliclist = min(20, len(candidates))
+    while (numpubliclist < targetnumpubliclist):
+      for player in sample(candidates, targetnumpubliclist - numpubliclist):
+        player.publiclist = 1
+        numpubliclist = numpubliclist + 1
+        candidates.remove(player)
 
     for p in update:
       self.response.out.write('%s %d<br />' % (p.nickname, p.publiclist))
     db.put(update)
+
+
+class FreeAttempts(webapp.RequestHandler):
+  def get(self):
+    game_name = self.request.get('game_name')
+    players = Player.in_game(game_name)
+    updates = []
+    for p in players:
+      p.numfailtries = 0
+      updates.append(p)
+    db.put(updates)

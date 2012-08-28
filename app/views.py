@@ -34,10 +34,7 @@ class MainPage(webapp.RequestHandler):
     num_players = Player.in_game(game_name).count()
     num_players_dead = Mission.in_game(game_name).filter('status !=', None).filter('status <', 0).count()
     num_players_alive = num_players - num_players_dead
-    num_kills = Mission.in_game(game_name)\
-                       .filter('assassin =', player_name)\
-                       .filter('status =', Mission.SUCCESS)\
-                       .count()
+    num_kills = player.get_kills().count()
     winner = Mission.in_game(game_name).filter('status =', Mission.WIN).get()
 
     stats_list.append(('Total Players', num_players))
@@ -49,7 +46,7 @@ class MainPage(webapp.RequestHandler):
 
     leaderboard = []
     leaders = Player.get_top_killers(5)
-    leaderboard = [(name, kills, 'ACTIVE' if status else 'KILLED') for name, kills, status in leaders]
+    leaderboard = [(name, kills, 'ACTIVE' if status else 'DEAD') for name, kills, status in leaders]
 
     if users.get_current_user():
       url = users.create_logout_url(self.request.uri)
@@ -155,6 +152,12 @@ class Kill(webapp.RequestHandler):
       player = Player.get(game_name, player_name)
       mission = Mission.in_game(game_name).filter(
         'assassin =', player_name).filter('timestamp =', None).get()
+      if player.numfailtries > 3:
+        self.response.out.write(json.dumps({
+          'status': 'error',
+          'message': "Too many failed attempts. Please wait a while before trying again."
+        }))
+        return
       
       if player.code.upper() == code:
         try:
@@ -169,6 +172,7 @@ class Kill(webapp.RequestHandler):
             'message': "Cannot commit suicide. (%s)" % e
           }))
       elif not terminator:
+        # Be more restrictive if terminator is off and make sure code is right.
         try:
           victim = Player.get(game_name, mission.victim)
           if victim.code.upper() != code:
@@ -194,6 +198,8 @@ class Kill(webapp.RequestHandler):
             'message': "You've killed %s!" % victim.nickname
           }))
         except AssassinationException, e:
+          player.numfailtries = player.numfailtries + 1
+          player.put()
           self.response.out.write(json.dumps({
             'status': 'error',
             'message': "Invalid code."

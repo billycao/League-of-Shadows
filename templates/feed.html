@@ -4,9 +4,9 @@
 {% for event in events %}
     {% if event.status and event.status != 0 and event.status != -1 %}
       {% if event.status > 0 %}
-          <li><strong>{{ event.assassin }}</strong> {{ event.action }} <strong>{{ event.victim }}</strong>!!
+          <li><strong>{{ event.assassin }}</strong> {{ event.cause_of_death }} <strong>{{ event.victim }}</strong>!!
       {% else %}{% if event.status == -2 %}
-          <li><strong>{{ event.assassin }}</strong> {{ event.action }}!!
+          <li><strong>{{ event.assassin }}</strong> {{ event.cause_of_death }}!!
       {% endif %}{% endif %}
       <span class="timestamp">{{ event.timestamp }}</span></li>
     {% endif %}

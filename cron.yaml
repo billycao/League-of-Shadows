@@ -1,0 +1,13 @@
+﻿cron:
+- description: Update Player.numkills
+  url: /admin/updatenumkills
+  schedule: every day 00:00
+  target: version-2
+- description: Refresh public hitlist
+  url: /admin/genkilllist
+  schedule: every day 00:05
+  target: version-2
+- description: Let people try again after too many attempts
+  url: /admin/freeattempts
+  schedule: every 1 hours
+  target: version-2

@@ -84,8 +84,8 @@
                 {% endif %}
             {% endif %}
             <hr />
-            <h3>Terminator System</h3>
-            <small>Coming soon!</small>
+            You can still assassinate people in the public hitlist when you are dead.
+            {% include 'killform.html' %}
             <hr />
             <small>Think you died in error? Contact us below!</small>
         {% endif %}{% endif %}
@@ -173,6 +173,11 @@
     <a href="mailto:billycao+league@google.com,nsolichin+league@google.com,shiryehoshua+league@google.com,tinaroh+league@google.com?subject=[League of Interns]" target="_blank">
         Contact Us
     </a>
+</div>
+
+<div id="cornerpanel">
+<h3>Public Hitlist</h3>
+{% include 'killlist.html' %}
 </div>
 
 </div> <!-- wrapper -->
