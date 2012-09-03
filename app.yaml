@@ -1,4 +1,4 @@
-﻿application: leagueofshadows
+﻿application: leagueofshadows-demo
 version: 1
 runtime: python
 api_version: 1
@@ -66,7 +66,9 @@ env_variables:
   # Maximum number of players per game
   max_players: 200
   # Time zones are in ISO 8601, eg.'2013-01-01T00:00-07:00' is midnight morning of New Year, 2013, Pacific Time
-  # Note js countdown widget has a max range of 99 days
+  # Note js countdown widget has a max range of 99 days.
+  # THESE TIMES ARE ONLY FOR THE JAVASCRIPT COUNTDOWN UI. The game needs to be started and ended manually by an admin.
+  # TODO(billycao): Automatic crons to start and end the game automagically.
   time_registration_ends: 2013-01-01T00:00-07:00
   time_game_begins: 2013-01-01T00:00-07:00
   time_game_ends: 2013-01-02T00:00-07:00

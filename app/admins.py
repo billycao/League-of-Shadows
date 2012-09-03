@@ -74,7 +74,7 @@ class Renderer(webapp.RequestHandler):
 
 class CreateGame(webapp.RequestHandler):
   def get(self):
-    game_name = self.request.get('game_name')
+    game_name = self.request.get('game_name') or os.environ['default_game_name']
     if db.get(Game.get_key(game_name or 'default_game')):
       self.response.out.write("Exists")
       return
@@ -85,7 +85,7 @@ class CreateGame(webapp.RequestHandler):
 # Assigns top leaderboard player as winner if no winner already exists
 class EndGame(webapp.RequestHandler):
   def get(self):
-    game_name = self.request.get('game_name')
+    game_name = self.request.get('game_name') or os.environ['default_game_name']
     winner = Mission.in_game(game_name).filter('status =', Mission.WIN).get()
     if (winner):
       self.response.out.write("Done - " + winner.assassin + " already winner.")
@@ -104,7 +104,7 @@ class EndGame(webapp.RequestHandler):
 
 class ResetGame(webapp.RequestHandler):
   def get(self):
-    game_name = self.request.get('game_name')
+    game_name = self.request.get('game_name') or os.environ['default_game_name']
     missions = Mission.in_game(game_name).fetch(None)
     db.delete(missions)
     self.response.out.write("Done")
@@ -112,7 +112,7 @@ class ResetGame(webapp.RequestHandler):
 
 class StartGame(webapp.RequestHandler):
   def get(self):
-    game_name = self.request.get('game_name')
+    game_name = self.request.get('game_name') or os.environ['default_game_name']
     if Game.has_started(game_name):
       self.response.out.write("Already started")
       return
