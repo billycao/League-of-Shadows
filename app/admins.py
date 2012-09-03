@@ -82,8 +82,27 @@ class CreateGame(webapp.RequestHandler):
     game.put()
     self.response.out.write("Created")
 
-
+# Assigns top leaderboard player as winner if no winner already exists
 class EndGame(webapp.RequestHandler):
+  def get(self):
+    game_name = self.request.get('game_name')
+    winner = Mission.in_game(game_name).filter('status =', Mission.WIN).get()
+    if (winner):
+      self.response.out.write("Done - " + winner.assassin + " already winner.")
+      return
+    else:
+      leaders = Player.get_top_killers(1)
+      if (len(leaders) > 0):
+        winner_name = leaders[0][0]
+        winner_mission = Mission(parent=Game.get_key(game_name))
+        winner_mission.assassin = winner_name
+        winner_mission.victim = winner_name
+        winner_mission.status = 9001
+        winner_mission.put()
+        self.response.out.write("Done - " + winner_name + " marked winner.")
+
+
+class ResetGame(webapp.RequestHandler):
   def get(self):
     game_name = self.request.get('game_name')
     missions = Mission.in_game(game_name).fetch(None)

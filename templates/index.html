@@ -17,8 +17,7 @@
     <h2>{{ FLAGS.global_desc|safe }}</h2>
 </div>
 
-{# TODO(billycao): Add wrapper/styles for this #}
-{% if FLAGS.show_countdown == 'True' %}
+{% if not winner and FLAGS.show_countdown == 'True' %}
     <div id="countdown_wrapper">
         <div id="countdown"></div>
         <p id="note" class="note"></p>
@@ -43,14 +42,18 @@
             <th>RANK</th>
             <th>NAME</th>
             <th>KILLS</th>
-            <th>STATUS</th>  
+            {% if not winner %}
+            <th>STATUS</th>
+            {% endif %}
         </tr>
         {% for name, kills, status in leaderboard %}
             <tr class="leaderRow">
                 <td class="leaderRank">{{ forloop.counter }}</td>
                 <td>{{ name }}</td>
                 <td>{{ kills }}</td>
+                {% if not winner %}
                 <td>{{ status }}</td>
+                {% endif %}
             </tr>
         {% endfor %}
     </table>

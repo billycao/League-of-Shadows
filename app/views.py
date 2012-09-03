@@ -143,9 +143,14 @@ class JoinGame(webapp.RequestHandler):
 
 class Kill(webapp.RequestHandler):
   def post(self):
-    terminator = True
+    terminator = os.environ['public_hitlist'] == 'True'
     game_name = self.request.get('game_name')
     code = self.request.get('killcode').upper()
+
+    # If a winner already exists no kills can be made.
+    winner = Mission.in_game(game_name).filter('status =', Mission.WIN).get()
+    if (winner):
+      return
 
     if users.get_current_user():
       player_name = users.get_current_user().nickname()
@@ -155,9 +160,11 @@ class Kill(webapp.RequestHandler):
           'message': "Invalid CSRF token. Please refresh the page and try again."
         }))
         return
+
       player = Player.get(game_name, player_name)
       mission = Mission.in_game(game_name).filter(
         'assassin =', player_name).filter('timestamp =', None).get()
+
       if player.numfailtries > 3:
         self.response.out.write(json.dumps({
           'status': 'error',
