@@ -9,22 +9,12 @@ Setup
 1. [Create an App Engine application](https://appengine.google.com).
 2. [Download the Google App Engine SDK for Python](https://developers.google.com/appengine/downloads).
 3. Change the application: line in app.yaml to the name of the application you just created.
-4. Edit the env_variables in app.yaml to suit your needs. You'll likely at least need to change:
-
-global\_name
-
-global\_desc
-
+4. Edit the env_variables in app.yaml to suit your needs. You'll likely at least need to change: * global\_name * global\_desc
 short\_desc
-
 rules
-
 faq
-
 contact\_emails
-
 time\_*
-
 5. Upload the application to appengine by running the following command:
     appcfg.py update .
 6. Create a game by navigating to /admin/create?game_name=default
