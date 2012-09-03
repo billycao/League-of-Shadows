@@ -1,5 +1,5 @@
-﻿application: google.com:leagueofinterns
-version: 2
+﻿application: leagueofshadows
+version: 1
 runtime: python
 api_version: 1
 threadsafe: yes
@@ -7,18 +7,16 @@ threadsafe: yes
 # Accessed with os.environ in App Engine
 env_variables:
   # The default game_name to use when no game_name param is given
-  default_game_name: MTV
+  default_game_name: default
 
   # The name of the app (Eg. "League of Interns")
-  global_name: League of Interns
+  global_name: League of Shadows
   # The header desc (Eg. "An internal assassins game")
   global_desc: |
-    An internal <a href="http://en.wikipedia.org/wiki/Assassin_(game)">assassins</a>
-    game for the summer MTV interns of 2012
+    An online assassins game powered by App Engine.
   # The body desc (Eg. "Pick up your weapon from Bob")
   short_desc: |
-    Please review the rules below, pick up your weapon from <b>MTV-43-132</b>,
-    and wait for your first target!
+    Please review the rules below!
   # Show the internal title of the current game (eg. 'MTV') on the UI.
   show_game_title: false
   # Show the JS countdown timer
@@ -27,8 +25,43 @@ env_variables:
   show_stats: true
   # Show leaderboard
   show_leaderboard: true
+  # Rules
+  rules: |
+    <i>How to play:</i>
+    <p>&nbsp;&nbsp;Assassins is a game of cleverness and stealth. You will be given a target, and your job is to eliminate that target with your weapon.
+    They will give you a kill code that you must enter into this site once they are killed.
+    Otherwise, your kill will not be counted.</p>
+    <p>&nbsp;&nbsp;But don't relax too much -- there will be an assassin after you as well. If you are killed, be honorable and properly admit to your kill as soon as possible so that targets may be transferred.</p>
+    <p>&nbsp;&nbsp;Once a target is killed, that target's target will become the killer's new target. Targets will continue to be transferred until there is one person left.</p>
+    <ol>
+        <li>Do not disrupt others.</li>
+        <li><strong>No indoor kills</strong>. Playing the game indoors is disruptful.</li>
+        <li>Do not hurt anyone, including your target.</li>
+        <li>Only target your own target.</li>
+        <li>Be honest. If you were killed, surrender your kill code.</li>
+    </ol>
+
+    If you are found breaking any of these rules, you may be disqualified.
+  # FAQs
+  # FAQs for suicides and the public_hitlist are automatically added depending on allow_suicide: true and public_histlist:true.
+  # You can change this behavior in templates/index.html
+  faq: |
+    <p>
+        <b>Q: </b><i>How do I eliminate my target?</i><br />
+        <b>A: </b>Just pin them with your weapon! However, be careful not to actually harm your victim, not to disrupt others, and review the rules.<br /><br />
+        When you get killed, surrender your <strong>kill code</strong> so your death can be recorded.
+    </p>
+    <p>
+        <b>Q: </b><i>Where do I get a weapon?</i><br />
+        <b>A: </b>You can either provide your own, or pick up your weapon from us. We recommend writing your kill code on it to make it easy to remember.
+    </p>
+    <p>
+        <b>Q: </b><i>Are there prizes?</i><br />
+        <b>A: </b>There will be prizes for the last player alive (and/or the individual(s) with the most kills), as well as a badge for the top-ranking players.<br /><br />
+    </p>
+
   # Emails for the Contact Us link
-  contact_emails: billycao+league@google.com,nsolichin+league@google.com,shiryehoshua+league@google.com,tinaroh+league@google.com
+  contact_emails: admin@example.com
 
   # Maximum number of players per game
   max_players: 200
@@ -46,33 +79,23 @@ env_variables:
   num_histlist: 20
 
   # Send email to players upon start
-  send_start_email: true
+  send_start_email: false
   # Sender of start_email. This must be an admin email
-  start_email_sender: "League of Interns <billycao@google.com>"
+  start_email_sender: "League of Shadows <admin@example.com>"
   # HTML email to send to players when the game begins, %s = game_name
   start_email_body: |
-    Thanks for joining the <a href="https://leagueofinterns.googleplex.com/?game_name=%s">League of Interns</a>!<br />
+    Thanks for joining the <a href="https://www.example.com/?game_name=%s">League of Shadows</a>!<br />
     <br />
     <b>The games have begun</b>!<br />
     <br />
-    Check the site for your first target, updated rules/FAQ, and your kill code (remember it!).<br />
-    <br />
-    If you haven't yet, pick up your weapon from MTV-43-132!<br />
+    Check the site for your first target, rules/FAQ, and your kill code (remember it!).<br />
     <br />
     --- <br />
-    <br />
-    Important note: The boat cruise tonight is fair game for all. Indoors/outdoors no one is safe on the boat!<br />
-    <br />
-    Also remember that otherwise the no indoors rule is strict. This includes indoor cafes.<br />
-    <br />
-    An extra note: The two planners with database access (billycao@ and nsolichin@) have chosen to exempt ourselves from being able to win prizes in the interest of fairness. We'll still play, we just cant win.<br />We'll only tamper with the database if something goes wrong and manual editing is required.<br />
     <br />
     Be ninja, play fair, and <b>good luck</b>!<br />
     ---<br />
     <br />
-    This message was automatically generated by League of Interns. Problems? Let us know!<br />
-    <br />
-    Don't worry, we won't spam you. Future email notifications will be opt-out.<br />
+    This message was automatically generated by League of Shadows. Problems? Let us know!<br />
 
 handlers:
 # Favicon

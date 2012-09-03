@@ -122,42 +122,11 @@
 <div id="main_column" class="column">
     <div class="expandable" onclick="selectColumn('rules')"><div class="section_title"><h3><b>&raquo;</b> Rules</h3></div></div>
     <div id="rules" class="section">
-        <i>How to play:</i>
-        <p>&nbsp;&nbsp;Assassins is a game of cleverness and stealth. You will be given a target, and your job is to eliminate that target by
-        clipping a clothespin onto their clothes. They will give you a kill code that you must enter into this site once they are killed.
-        Otherwise, your kill will not be counted.</p>
-        <p>&nbsp;&nbsp;But don't relax too much -- there will be an assassin after you as well. If you are killed, be honorable and properly admit to your kill as soon as possible so that targets may be transferred.</p>
-        <p>&nbsp;&nbsp;Once a target is killed, that target's target will become the killer's new target. Targets will continue to be transferred until there is one person left.</p>
-        <ol>
-            <li>Do not disrupt others.</li>
-            <li><strong>No indoor kills</strong>. Playing the game indoors is disruptful.</li>
-            <li>Do not hurt anyone, including your target.</li>
-            <li>Only target your own target.</li>
-            <li>Be honest. If you were killed, surrender your kill code.</li>
-        </ol>
-
-        If you are found breaking any of these rules, you may be disqualified.
+        {{ FLAGS.rules|safe }}
     </div>
     <div class="expandable" onclick="selectColumn('faq')"><div class="section_title"><h3><b>&raquo;</b> FAQ</h3></div></div>
     <div id="faq" class="section">
-        <p>
-            <b>Q: </b><i>How do I eliminate my target?</i><br />
-            <b>A: </b>Just clip them with your clothespin! However, be careful not to actually harm your victim, not to disrupt others, and review the rules.<br /><br />
-            When you get clipped, surrender your <strong>kill code</strong> so your death can be recorded.
-        </p>
-        <p>
-            <b>Q: </b><i>Where do I get a clothespin?</i><br />
-            <b>A: </b>You can either provide your own, or pick up your weapon from MTV-43-132. There should a few interns passing out clothespins. If not, simply take one from the bag. We recommend writing your kill code on it to make it easy to remember.
-        </p>
-        <p>
-            <b>Q: </b><i>How long will the game last?</i><br />
-            <b>A: </b>The game will last until <strong>Midnight, Friday, Aug. 31st</strong>. A countdown will appear during the last week.
-        </p>
-        <p>
-            <b>Q: </b><i>Are there prizes?</i><br />
-            <b>A: </b>There will be prizes for the last player alive (and/or the individual(s) with the most kills), as well as a badge for the top-ranking players.<br /><br />
-            Stay tuned for more info!
-        </p>
+        {{ FLAGS.faq|safe }}
         {% if FLAGS.allow_suicide == 'True' %}
         <p>
             <b>Q: </b><i>I don't want to/can't play anymore!</i><br />
@@ -167,7 +136,7 @@
         {% if FLAGS.public_hitlist == 'True' %}
         <p>
             <b>Q: </b><i>I've died, what now?</i><br />
-            <b>A: </b>The game still isn't over! The daily public hitlist randomly selects .
+            <b>A: </b>The game still isn't over! The daily public hitlist randomly selects players with no kills who can be killed by anyone (even dead players)!
         </p>
         {% endif %}
     </div>
