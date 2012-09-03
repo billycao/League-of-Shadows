@@ -2,7 +2,7 @@
 from datetime import timedelta
 import sys, os
 import urllib
-
+from lib import csrf
 try:
     import json
 except ImportError:
@@ -12,41 +12,46 @@ from google.appengine.ext.webapp import template
 from google.appengine.api import users
 from google.appengine.ext import webapp
 from app.models import *
-from lib import csrf
 
 class MainPage(webapp.RequestHandler):
   def get(self):
-    game_name = self.request.get('game_name') or 'MTV'
-    player_name = users.get_current_user().nickname()
-    game_started = Game.has_started(game_name)
-
     games = Game.all()
     if not games.count():
-        # TODO(billycao): Migrate to template
-        self.response.out.write("No game has been created yet.<br />"
-                                "The administrator must create one before the awesomeness begins.")
-        return
+      # TODO(billycao): Migrate to template
+      self.response.out.write("No game has been created yet.<br />"
+                              "The administrator must create one before the awesomeness begins.")
+      return
 
+    game_name = self.request.get('game_name') or os.environ['default_game_name']
+    game_started = Game.has_started(game_name)
+
+    player_name = users.get_current_user().nickname()
     player = Player.get(game_name, player_name)
 
     # Game statistics
-    stats_list = []
     num_players = Player.in_game(game_name).count()
     num_players_dead = Mission.in_game(game_name).filter('status !=', None).filter('status <', 0).count()
     num_players_alive = num_players - num_players_dead
-    num_kills = player.get_kills().count()
     winner = Mission.in_game(game_name).filter('status =', Mission.WIN).get()
+    publiclist = Player.in_game(game_name).filter('publiclist >', 0).fetch(None)
 
+    # Leaderboard
+    leaderboard = []
+    leaders = Player.get_top_killers(5)
+    leaderboard = [(name, kills, 'ACTIVE' if status else 'DEAD') for name, kills, status in leaders]
+
+    # Player specific statistics
+    num_kills = 0
+    missions = None
+    if player != None:
+      num_kills = player.get_kills().count()
+      missions = player.past_missions().fetch(None)
+
+    stats_list = []
     stats_list.append(('Total Players', num_players))
     stats_list.append(('Survivors', num_players_alive))
     stats_list.append(('Players Dead', num_players_dead))
     stats_list.append(('Your Kills', num_kills))
-
-    publiclist = Player.in_game(game_name).filter('publiclist >', 0).fetch(None)
-
-    leaderboard = []
-    leaders = Player.get_top_killers(5)
-    leaderboard = [(name, kills, 'ACTIVE' if status else 'DEAD') for name, kills, status in leaders]
 
     if users.get_current_user():
       url = users.create_logout_url(self.request.uri)
@@ -56,7 +61,6 @@ class MainPage(webapp.RequestHandler):
       url_linktext = 'Login'
 
     template_values = {
-      'show_countdown': 1,
       'csrf_token': csrf.get_csrf_token(player_name),
       'game_name': game_name,
       'game_started': game_started,
@@ -66,7 +70,7 @@ class MainPage(webapp.RequestHandler):
           "Remember it, and surrender it upon death.",
           "Hover to view. Keep it hidden. Keep it safe."
       ],
-      'missions': player.past_missions().fetch(None),
+      'missions': missions,
       'leaderboard': leaderboard,
       'num_players': num_players,
       'stats_list': stats_list,
@@ -77,8 +81,8 @@ class MainPage(webapp.RequestHandler):
       'player': player,
       'publiclist': publiclist,
       'winner': winner,
-      'FLAGS_show_game_title': os.environ['show_game_title'] == "True",
-      'FLAGS_max_players': int(os.environ['max_players'])
+      'max_players': int(os.environ['max_players']),
+      'FLAGS': os.environ,
     }
 
     if player:
@@ -92,9 +96,11 @@ class MainPage(webapp.RequestHandler):
 class KillList(webapp.RequestHandler):
   def get(self):
     game_name = self.request.get('game_name')
-    publiclist = Player.in_game(game_name).filter('publiclist >', 0).fetch(None)
+    public_hitlist = []
+    if (os.environ['public_hitlist'] == 'true'):
+      public_hitlist = Player.in_game(game_name).filter('publiclist >', 0).fetch(None)
     template_values = {
-      'publiclist': publiclist
+      'public_hitlist': public_hitlist
     }
     path = os.path.join(os.path.dirname(__file__)+ '/../templates/', 'killlist.html')
     self.response.out.write(template.render(path, template_values))
@@ -146,7 +152,7 @@ class Kill(webapp.RequestHandler):
       if not csrf.check_csrf_token(player_name, self.request.get('csrf_token')):
         self.response.out.write(json.dumps({
           'status': 'error',
-          'message': "Invalid token. Please refresh the page and try again."
+          'message': "Invalid CSRF token. Please refresh the page and try again."
         }))
         return
       player = Player.get(game_name, player_name)
@@ -159,7 +165,7 @@ class Kill(webapp.RequestHandler):
         }))
         return
       
-      if player.code.upper() == code:
+      if os.environ['allow_suicide'] == 'True' and player.code.upper() == code:
         try:
           player.die(player_name)
           self.response.out.write(json.dumps({

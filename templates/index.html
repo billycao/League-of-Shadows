@@ -6,28 +6,26 @@
 <link type="text/css" rel="stylesheet" href="/stylesheets/jquery.countdown.css" />
 </head>
 <body>
+
 {% spaceless %}
 <div id="wrapper">
-
 <div id="header">
-    <h1>League of Interns</h1>
-    <h2>An internal <a href="http://en.wikipedia.org/wiki/Assassin_(game)">assassins</a>
-        game for the summer MTV interns of 2012</h2>
+    <h1>{{ FLAGS.global_name }}</h1>
+    {% if FLAGS.show_game_title == 'True' %}
+        <h2><strong>Game: {{ game_name }}</strong></h2>
+    {% endif %}
+    <h2>{{ FLAGS.global_desc|safe }}</h2>
 </div>
 
 {# TODO(billycao): Add wrapper/styles for this #}
-{% if FLAGS_show_game_title  %}
-    <h1>Game: {{ game_name }}</h1>
-{% endif %}
-
-{% if show_countdown %}
+{% if FLAGS.show_countdown == 'True' %}
     <div id="countdown_wrapper">
         <div id="countdown"></div>
         <p id="note" class="note"></p>
     </div>
 {% endif %}
 
-{% if game_started and is_registered %}
+{% if game_started and FLAGS.show_stats == 'True' %}
     <div id="stats_wrapper" class="container" style="width: {{ stats_list_width }}px">
         {% for statname, statnum in stats_list %}
             <div class="stat">
@@ -38,7 +36,7 @@
     </div>
 {% endif %}
 
-{% if game_started %}
+{% if game_started and FLAGS.show_leaderboard == 'True' %}
     <table id="leaderboard" class="container">
         <tr><h1 id="leaderHeader">TOP ASSASSINS</h1></tr>
         <tr>
@@ -84,31 +82,30 @@
                 {% endif %}
             {% endif %}
             <hr />
-            You can still assassinate people in the public hitlist when you are dead.
-            {% include 'killform.html' %}
-            <hr />
+            {% if FLAGS.public_hitlist == 'True' %}
+                You can still assassinate people in the public hitlist when you are dead.
+                {% include 'killform.html' %}
+                <hr />
+            {% endif %}
             <small>Think you died in error? Contact us below!</small>
         {% endif %}{% endif %}
     {% else %}{# not started #}
-        <h3>Welcome to the League!</h3>
+        <h3>Welcome!</h3>
         <hr />
-        Please review the rules below, pick up your weapon from <b>MTV-43-132</b>, and wait for your first target!
+        {{ FLAGS.short_desc|safe }}
         <hr />
         {% include "killcode.html" %}
         <hr />
-        <small>{{ num_players|add:-1 }} other interns have joined.</small>
+        <small>{{ num_players|add:-1 }} other assssins have joined.</small>
     {% endif %}
     </div>
 {% else %}{# not registered #}
     <div id="register_wrapper">
     {% if game_started %}
         Sorry! Registration has ended and the game is underway!<br /><br />
-        However, we're working on a system to let players join the game as <strong>Terminators</strong>.<br /><br />
-        Check back soon!
     {% else %}{# not started #}
-        {% if num_players >= FLAGS_max_players %}
-            Sorry, but the maximum player count of {{ FLAGS_max_players }} has been reached.<br /><br />
-            Please check back soon, as there is a good chance we will raise this cap.
+        {% if num_players >= max_players %}
+            Sorry, but the maximum player count of {{ max_players }} has been reached.<br /><br />
         {% else %}
             {% include 'registerform.html' %}
         {% endif %}
@@ -156,32 +153,39 @@
             <b>A: </b>There will be prizes for the last player alive (and/or the individual(s) with the most kills), as well as a badge for the top-ranking players.<br /><br />
             Stay tuned for more info!
         </p>
+        {% if FLAGS.allow_suicide == 'True' %}
         <p>
             <b>Q: </b><i>I don't want to/can't play anymore!</i><br />
             <b>A: </b>No problem! Commit suicide by <strong>entering your own kill code</strong>. Your kills will still be tallied for prizes. Beware though, you can't undo this!
         </p>
+        {% endif %}
+        {% if FLAGS.public_hitlist == 'True' %}
         <p>
             <b>Q: </b><i>I've died, what now?</i><br />
-            <b>A: </b>The game still isn't over! We're working on a <strong>Terminator</strong> system that will list idle assassins (those that haven't killed anyone in 3 days) to be killed by <em>anyone</em>.
+            <b>A: </b>The game still isn't over! The daily public hitlist randomly selects .
         </p>
+        {% endif %}
     </div>
 </div>
 </div>
 
 <div id="footer">
     <a href="{{ url }}">{{ url_linktext }}</a> |
-    <a href="mailto:billycao+league@google.com,nsolichin+league@google.com,shiryehoshua+league@google.com,tinaroh+league@google.com?subject=[League of Interns]" target="_blank">
+    <a href="mailto:{{ FLAGS.contact_emails }}?subject=[League of Interns]" target="_blank">
         Contact Us
     </a>
 </div>
 
-<div id="cornerpanel">
-<h3>Public Hitlist</h3>
-{% include 'killlist.html' %}
-</div>
+{% if game_started and FLAGS.public_hitlist == 'True' %}
+    <div id="cornerpanel">
+    <h3>Public Hitlist</h3>
+    {% include 'killlist.html' %}
+    </div>
+{% endif %}
 
 </div> <!-- wrapper -->
 {% endspaceless %}
+
 <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
 <script type="text/javascript" src="/js/jquery.countdown.js"></script>
 <script type="text/javascript" src="/js/main.js"></script>
@@ -191,16 +195,16 @@ jQuery(function() {
     {% if is_registered %}
         {% if game_started %}
             // Show countdown to game end
-            var ts = new Date(2012, 7, 31, 24, 0).getTime();
+            var ts = new Date('{{ FLAGS.time_game_ends }}').getTime();
             var event = "the game ends!";
         {% else %}
             // Show countdown to game start
-            var ts = new Date(2012, 7, 2, 11, 0).getTime();
+            var ts = new Date('{{ FLAGS.time_game_begins }}').getTime();
             var event = "the games begin!";
         {% endif %}
     {% else %}
         // Show countdown to registration end
-        var ts = new Date(2012, 7, 2, 11, 0).getTime();
+        var ts = new Date('{{ FLAGS.time_registration_ends }}').getTime();
         var event = "registration ends!";
     {% endif %}
 
@@ -225,10 +229,12 @@ jQuery(function() {
             $('#killerror').text('');
             var killcode = killform.children('#killcode').val();
             var playercode = "{{ player.code }}"
-            if (killcode.toLowerCase() == playercode.toLowerCase() &&
-                !confirm('Are you sure you want to commit suicide?')) {
-                return false;
-            }
+            {% if FLAGS.allow_suicide == 'True' %}
+                if (killcode.toLowerCase() == playercode.toLowerCase() &&
+                    !confirm('Are you sure you want to commit suicide?')) {
+                    return false;
+                }
+            {% endif %}
             $.post(killform.attr('action'), killform.serialize(), function(data) {
                 if (data.status == "success") {
                     $('#killsuccess').text(data.message);
