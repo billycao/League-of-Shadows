@@ -10,6 +10,7 @@ Setup
 2. [Download the Google App Engine SDK for Python](https://developers.google.com/appengine/downloads).
 3. Change the application: line in app.yaml to the name of the application you just created.
 4. Edit the env_variables in app.yaml to suit your needs. You'll likely at least need to change:
+
 global_name
 global_desc
 short_desc
