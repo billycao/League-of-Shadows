@@ -56,14 +56,15 @@
     </table>
 {% endif %}
 
+{% if winner %}
+    <div id="status">
+    <strong>{{ winner.assassin }} has won!</strong>
+    </div>
+{% else %}
 {% if is_registered %}
     <div id="status">
     {% if game_started %}
-        {% if winner %}
-            <strong>{{ winner.assassin }} is the last assassin standing!</strong><br /><br />
-            Stay tuned as we announce the winners, top players, and stats!
-
-        {% else %}{% if target_mission %}
+        {% if target_mission %}
             <h3>The games have begun!</h3>
             <hr />
             Your target is <strong>{{ target_mission.victim|default:"unassigned" }}</strong>.<br />
@@ -88,7 +89,7 @@
                 <hr />
             {% endif %}
             <small>Think you died in error? Contact us below!</small>
-        {% endif %}{% endif %}
+        {% endif %}
     {% else %}{# not started #}
         <h3>Welcome!</h3>
         <hr />
@@ -112,6 +113,7 @@
     {% endif %}
     </div>
 {% endif %}
+{% endif %}{# winner #}
 
 <div id="column_wrapper">
 <div id="main_column" class="column">
