@@ -11,13 +11,20 @@ Setup
 3. Change the application: line in app.yaml to the name of the application you just created.
 4. Edit the env_variables in app.yaml to suit your needs. You'll likely at least need to change:
 
-global_name
-global_desc
-short_desc
+global\_name
+
+global\_desc
+
+short\_desc
+
 rules
+
 faq
-contact_emails
-time_*
+
+contact\_emails
+
+time\_*
+
 5. Upload the application to appengine by running the following command:
     appcfg.py update .
 6. Create a game by navigating to /admin/create?game_name=default
